@@ -1,6 +1,0 @@
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\bin\Debug\net6.0\CoverletSourceRootsMapping
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\obj\Debug\net6.0\AcademyGestionGeneral-XUnitTest.csproj.AssemblyReference.cache
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\obj\Debug\net6.0\AcademyGestionGeneral-XUnitTest.GeneratedMSBuildEditorConfig.editorconfig
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\obj\Debug\net6.0\AcademyGestionGeneral-XUnitTest.AssemblyInfoInputs.cache
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\obj\Debug\net6.0\AcademyGestionGeneral-XUnitTest.AssemblyInfo.cs
-D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral-XUnitTest\obj\Debug\net6.0\AcademyGestionGeneral-XUnitTest.csproj.CoreCompileInputs.cache
