@@ -5,7 +5,6 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
-    <DocumentationFile>D:\Escritorio\academy-gestion-general\academy-gestion-general\AcademyGestionGeneral\bin\Debug\net6.0\AcademyGestionGeneral.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
