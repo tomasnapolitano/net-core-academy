@@ -1,4 +1,5 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.Service;
+using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System;
@@ -18,7 +19,7 @@ namespace Services
             _serviceRepository = serviceRepository;
         }
 
-        public List<Service> GetServices()
+        public List<ServiceDTO> GetServices()
         {
             return _serviceRepository.GetServices().Result;
         }

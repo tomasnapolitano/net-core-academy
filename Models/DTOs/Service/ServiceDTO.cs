@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.DTOs
+namespace Models.DTOs.Service
 {
-    public class ServiceViewDTO
+    public class ServiceDTO
     {
         public int ServiceId { get; set; }
         public int ServiceTypeId { get; set; }

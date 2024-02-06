@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Models.DTOs.Service;
 using Models.Entities;
 using Services.Interfaces;
 
@@ -24,7 +25,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpGet]
-        public List<Service> GetServices()
+        public List<ServiceDTO> GetServices()
         {
             return _serviceService.GetServices();
         }

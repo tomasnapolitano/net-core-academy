@@ -1,4 +1,5 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.Service;
+using Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Repositories.Interfaces
 {
     public interface IServiceRepository
     {
-        Task<List<Service>> GetServices();
+        Task<List<ServiceDTO>> GetServices();
     }
 }

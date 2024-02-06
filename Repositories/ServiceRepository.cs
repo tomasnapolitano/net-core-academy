@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
+using Models.DTOs.District;
+using Models.DTOs.Service;
 using Models.Entities;
 using Repositories.Interfaces;
 using System;
@@ -12,16 +15,24 @@ namespace Repositories
     public class ServiceRepository : IServiceRepository
     {
         private readonly ManagementServiceContext _context;
+        private readonly IMapper _mapper;
 
-        public ServiceRepository(ManagementServiceContext context)
+        public ServiceRepository(ManagementServiceContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<List<Service>> GetServices()
+        public async Task<List<ServiceDTO>> GetServices()
         {
             var services = await _context.Services.ToListAsync();
-            return services;
+
+            if (services.Count == 0)
+            {
+                throw new KeyNotFoundException("La lista de servicios está vacía.");
+            }
+
+            return _mapper.Map<List<ServiceDTO>>(services);
         }
     }
 }

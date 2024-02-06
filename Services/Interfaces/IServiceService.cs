@@ -1,9 +1,10 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.Service;
+using Models.Entities;
 
 namespace Services.Interfaces
 {
     public interface IServiceService
     {
-        List<Service> GetServices();
+        List<ServiceDTO> GetServices();
     }
 }
