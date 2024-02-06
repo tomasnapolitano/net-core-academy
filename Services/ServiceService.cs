@@ -23,5 +23,10 @@ namespace Services
         {
             return _serviceRepository.GetServices().Result;
         }
+
+        public List<ServiceTypeDTO> GetServiceTypes()
+        {
+            return _serviceRepository.GetServiceTypes().Result;
+        }
     }
 }
