@@ -1,4 +1,4 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.User;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -13,7 +13,7 @@ namespace Services
             _usersRepository = usersRepository;
         }
 
-        public List<User> GetUsers()
+        public List<UserDTO> GetUsers()
         {
             return _usersRepository.GetUsers().Result;
         }
