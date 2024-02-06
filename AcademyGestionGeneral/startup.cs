@@ -4,6 +4,7 @@ using Middlewares;
 using Models.Entities;
 using Repositories;
 using Repositories.Interfaces;
+using Repositories.Utils;
 using Services;
 using Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -60,6 +61,8 @@ namespace AcademyGestionGeneral
                 });
                 config.IncludeXmlComments(xmlPath);
             });
+
+            services.AddAutoMapper(typeof(AutoMapperProfiles));
 
             services.AddCors(options =>
             {

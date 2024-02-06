@@ -1,5 +1,4 @@
-﻿using Models.Entities;
-using Repositories;
+﻿using Models.DTOs.District;
 using Repositories.Interfaces;
 using Services.Interfaces;
 
@@ -14,7 +13,7 @@ namespace Services
             _districtRepository = districtRepository;
         }
 
-        public List<District> GetDistricts()
+        public List<DistrictDTO> GetDistricts()
         {
             return _districtRepository.GetDistricts().Result;
         }
