@@ -1,9 +1,10 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.District;
+using Models.Entities;
 
 namespace Repositories.Interfaces
 {
     public interface IDistrictRepository
     {
-        Task<List<District>> GetDistricts();
+        Task<List<DistrictDTO>> GetDistricts();
     }
 }

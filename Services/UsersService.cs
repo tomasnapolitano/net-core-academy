@@ -1,5 +1,4 @@
-﻿using Models.DTOs;
-using Models.Entities;
+using Models.DTOs.User;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using Utils.Enum;
@@ -16,7 +15,7 @@ namespace Services
             _usersRepository = usersRepository;
         }
 
-        public List<User> GetUsers()
+        public List<UserDTO> GetUsers()
         {
             return _usersRepository.GetUsers().Result;
         }
@@ -30,7 +29,7 @@ namespace Services
             {
                 return _usersRepository.PostUser(userCreationDTO, userCreationDTO.RoleId).Result;
             }
-            // Si es agente se fuerza a que cree un solamente un CLIENTE
+            // Si es agente se fuerza a que cree solamente un CLIENTE
             else if (userRole == (int)UserRoleEnum.Agent)
             {
                 return _usersRepository.PostUser(userCreationDTO, (int)UserRoleEnum.Client).Result;

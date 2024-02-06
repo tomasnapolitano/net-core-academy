@@ -1,7 +1,9 @@
 ﻿using AcademyGestionGeneral.Controllers;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.Entities;
 using Repositories;
+using Repositories.Utils;
 using Services;
 
 namespace AcademyGestionGeneral_XUnitTest
@@ -20,7 +22,10 @@ namespace AcademyGestionGeneral_XUnitTest
             _managementContextFake = new ManagementServiceContext(options);
             GenerateDB();
 
-            var usersRepository = new UsersRepository(_managementContextFake);
+            var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
+            var mapper = mapConfig.CreateMapper();
+
+            var usersRepository = new UsersRepository(_managementContextFake, mapper);
             var usersService = new UsersService(usersRepository);
             _usersController = new UsersController(usersService);
         }
@@ -73,7 +78,10 @@ namespace AcademyGestionGeneral_XUnitTest
 
             _managementContextFake = new ManagementServiceContext(options);
 
-            var usersRepository = new UsersRepository(_managementContextFake);
+            var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
+            var mapper = mapConfig.CreateMapper();
+
+            var usersRepository = new UsersRepository(_managementContextFake, mapper);
             var usersService = new UsersService(usersRepository);
             _usersController = new UsersController(usersService);
 

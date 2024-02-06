@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.DTOs
+namespace Models.DTOs.User
 {
-    
+
     public class UserCreationDTO
     {
         [Required(ErrorMessage = "El id del ROL es requerido.")]
@@ -60,6 +60,6 @@ namespace Models.DTOs
         [Required(ErrorMessage = "El codigo postal de la localidad del usuario es requerido.")]
         [DataType(DataType.Text, ErrorMessage = "El codigo postal de la localidad del usuario solo acepta texto.")]
         [StringLength(maximumLength: 50, ErrorMessage = "El codigo postal de la localidad del usuario no debe tener más de {1} caracteres")]
-        public string PostalCode {  get; set; } 
+        public string PostalCode { get; set; }
     }
 }

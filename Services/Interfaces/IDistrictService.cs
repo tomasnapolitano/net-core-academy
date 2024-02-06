@@ -1,9 +1,9 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.District;
 
 namespace Services.Interfaces
 {
     public interface IDistrictService
     {
-        List<District> GetDistricts();
+        List<DistrictDTO> GetDistricts();
     }
 }

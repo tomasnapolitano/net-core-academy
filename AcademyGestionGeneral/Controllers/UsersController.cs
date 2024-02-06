@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using Models.DTOs;
-using Models.Entities;
+using Models.DTOs.User;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -25,7 +24,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpGet]
-        public List<User> GetUsers()
+        public List<UserDTO> GetUsers()
         {
             return _usersService.GetUsers();
         }

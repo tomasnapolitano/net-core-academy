@@ -1,11 +1,10 @@
-﻿using Models.DTOs;
-using Models.Entities;
+﻿using Models.DTOs.User;
 
 namespace Services.Interfaces
 {
     public interface IUsersService
-    {
-        List<User> GetUsers();
+    { 
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
+        List<UserDTO> GetUsers();
     }
 }
