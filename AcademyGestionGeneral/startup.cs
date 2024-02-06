@@ -29,6 +29,8 @@ namespace AcademyGestionGeneral
             services.AddTransient<IUsersRepository, UsersRepository>();
             services.AddTransient<IDistrictService, DistrictService>();
             services.AddTransient<IDistrictRepository, DistrictRepository>();
+            services.AddTransient<IServiceService, ServiceService>();
+            services.AddTransient<IServiceRepository, ServiceRepository>();
 
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
