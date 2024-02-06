@@ -21,9 +21,9 @@ namespace Repositories
         {
             var users = await _context.Users.ToListAsync();
 
-            if (users.Count < 1)
+            if (users.Count == 0)
             {
-                throw new KeyNotFoundException("No se encontraron distritos.");
+                throw new KeyNotFoundException("La lista de usuarios está vacía.");
             }
 
             return _mapper.Map<List<UserDTO>>(users);

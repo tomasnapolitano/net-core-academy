@@ -28,6 +28,5 @@ namespace Repositories
 
             return _mapper.Map<List<DistrictDTO>>(districts);
         }
-
     }
 }
