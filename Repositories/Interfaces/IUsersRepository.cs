@@ -1,9 +1,10 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.User;
+using Models.Entities;
 
 namespace Repositories.Interfaces
 {
     public interface IUsersRepository
     {
-        Task<List<User>> GetUsers();
+        Task<List<UserDTO>> GetUsers();
     }
 }

@@ -1,9 +1,9 @@
-﻿using Models.Entities;
+﻿using Models.DTOs.User;
 
 namespace Services.Interfaces
 {
     public interface IUsersService
     {
-        List<User> GetUsers();
+        List<UserDTO> GetUsers();
     }
 }
