@@ -34,5 +34,17 @@ namespace Repositories
 
             return _mapper.Map<List<ServiceDTO>>(services);
         }
+
+        public async Task<List<ServiceTypeDTO>> GetServiceTypes()
+        {
+            var serviceTypes = await _context.ServiceTypes.ToListAsync();
+
+            if (serviceTypes.Count == 0)
+            {
+                throw new KeyNotFoundException("La lista de tipos de servicios está vacía.");
+            }
+
+            return _mapper.Map<List<ServiceTypeDTO>>(serviceTypes);
+        }
     }
 }
