@@ -59,7 +59,6 @@ namespace Repositories
             await _context.AddAsync(addres);
             await _context.SaveChangesAsync();
 
-            //acordate de encriptar pass
             var user = new User() 
             {
                 RoleId = userRole,
@@ -79,10 +78,12 @@ namespace Repositories
             {
                 UserId = user.UserId,
                 RoleId = user.RoleId,
+                AdressId = user.AdressId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Dninumber = user.Dninumber
+                Dninumber = user.Dninumber,
+                CreationDate = user.CreationDate,
 
             };
             return userDTO;
