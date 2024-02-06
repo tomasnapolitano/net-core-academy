@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Models.DTOs;
 using Models.DTOs.District;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
 
@@ -15,6 +16,12 @@ namespace Repositories.Utils
 
             CreateMap<DistrictDTO, District>();
             CreateMap<District, DistrictDTO>();
+
+            CreateMap<Service, ServiceDTO>();
+            CreateMap<ServiceDTO, Service>(); 
+
+            CreateMap<ServiceType, ServiceTypeDTO>();
+            CreateMap<ServiceTypeDTO, ServiceType>();
         }
     }
 }
