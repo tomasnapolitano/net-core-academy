@@ -6,5 +6,6 @@ namespace Services.Interfaces
     public interface IServiceService
     {
         List<ServiceDTO> GetServices();
+        List<ServiceTypeDTO> GetServiceTypes();
     }
 }
