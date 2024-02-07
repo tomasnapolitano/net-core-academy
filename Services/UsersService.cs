@@ -55,5 +55,9 @@ namespace Services
             }
 
         }
+        public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
+        {
+            return _usersRepository.UpdateUser(userUpdateDTO).Result;
+        }
     }
 }
