@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.District;
+using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 
@@ -27,6 +28,18 @@ namespace Repositories
             }
 
             return _mapper.Map<List<DistrictDTO>>(districts);
+        }
+
+        public async Task<DistrictDTO> GetDistrictById(int id)
+        {
+            var district = await _context.Districts.FirstOrDefaultAsync(x => x.DistrictId == id);
+
+            if (district == null)
+            {
+                throw new KeyNotFoundException("No se encontro el distrito.");
+            }
+
+            return _mapper.Map<DistrictDTO>(district);
         }
     }
 }
