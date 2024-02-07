@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.District;
-using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 
