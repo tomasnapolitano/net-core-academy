@@ -44,5 +44,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _serviceService.GetServiceTypes();
         }
+
+        // POST: api/Service
+        /// <summary>
+        /// Inserta un Servicio nuevo.
+        /// </summary>
+        /// <returns>Servicio isertado</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost]
+        public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
+        {
+            return _serviceService.PostService(serviceCreationDTO);
+        }
     }
 }
