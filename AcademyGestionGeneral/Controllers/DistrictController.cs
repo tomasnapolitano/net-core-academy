@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.District;
+using Models.DTOs.User;
 using Models.Entities;
+using Services;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -28,6 +30,21 @@ namespace AcademyGestionGeneral.Controllers
         public List<DistrictDTO> GetDistricts()
         {
             return _districtService.GetDistricts();
+        }
+
+        // GET: api/District/5
+        /// <summary>
+        /// Obtiene un distrito
+        /// </summary>
+        /// <param name="id">Es el id del distrito</param>
+        /// <returns>DistrictDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("{id}")]
+        public DistrictDTO GetDistrictById(int id)
+        {
+            return _districtService.GetDistrictById(id);
         }
     }
 }
