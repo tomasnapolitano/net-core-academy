@@ -83,5 +83,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _usersService.GetAllAgents();
         }
+
+        // PUT: api/Users/1
+        /// <summary>
+        /// Actualiza los datos de un usuario
+        /// </summary>
+        /// <returns>UserDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("{id}")]
+        public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
+        {
+            return _usersService.UpdateUser(userUpdateDTO);
+        }
     }
 }
