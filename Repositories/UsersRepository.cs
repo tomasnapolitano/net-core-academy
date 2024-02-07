@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
+using Utils.Enum;
 
 namespace Repositories
 {
@@ -15,6 +16,16 @@ namespace Repositories
         {
             _context = context;
             _mapper = mapper;
+        }
+
+        public async Task<List<UserDTO>> GetAllAgent()
+        {
+            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
+            if (listAgent == null)
+            {
+                throw new KeyNotFoundException("No se encontraron agentes");
+            }
+            return _mapper.Map<List<UserDTO>>(listAgent);
         }
 
         public async Task<int> GetRoleById(int id)
