@@ -10,5 +10,6 @@
         public string Email { get; set; } = null!;
         public string Dninumber { get; set; } = null!;
         public DateTime CreationDate { get; set; }
+        public string FullName { get; set; } = null!;
     }
 }
