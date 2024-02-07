@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.District;
 using Models.DTOs.Service;
+using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using System;
@@ -45,6 +46,23 @@ namespace Repositories
             }
 
             return _mapper.Map<List<ServiceTypeDTO>>(serviceTypes);
+        }
+
+        public async Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO)
+        {
+            var serviceType = await _context.ServiceTypes.Where(x =>
+                                        x.ServiceTypeId == serviceCreationDTO.ServiceTypeId)
+                                        .FirstOrDefaultAsync();
+            if (serviceType == null)
+            {
+                throw new KeyNotFoundException($"No se encontró tipo de servicio con el Id: {serviceCreationDTO.ServiceTypeId}");
+            }
+
+            var service = _mapper.Map<Service>(serviceCreationDTO);
+            await _context.Services.AddAsync(service);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ServiceDTO>(service);
         }
     }
 }

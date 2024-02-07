@@ -12,5 +12,6 @@ namespace Repositories.Interfaces
     {
         Task<List<ServiceDTO>> GetServices();
         Task<List<ServiceTypeDTO>> GetServiceTypes();
+        Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO);
     }
 }
