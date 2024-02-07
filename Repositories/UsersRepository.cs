@@ -39,6 +39,37 @@ namespace Repositories
             return _mapper.Map<List<UserDTO>>(users);
         }
 
+        public async Task<UserDTO> GetUserById(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+
+            return _mapper.Map<UserDTO>(user);
+
+        }
+
+        public async Task<List<UserDTO>> GetUsersWithFullName()
+        {
+            var users = await _context.Users.Select(x => new UserDTO()
+                                            {
+                                                UserId = x.UserId,
+                                                RoleId = x.RoleId,
+                                                AdressId = x.AdressId,
+                                                FirstName = x.FirstName,
+                                                LastName = x.LastName,
+                                                Email = x.Email,
+                                                Dninumber = x.Dninumber,
+                                                CreationDate = x.CreationDate,
+                                                FullName = x.FirstName + ' ' + x.LastName
+                                            })
+                                            .ToListAsync();
+
+            return users;
+        }
+
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
         {
             var location = await _context.Locations.Where(x => x.PostalCode == userCreationDTO.PostalCode && x.DistrictId == userCreationDTO.DistrictId).FirstOrDefaultAsync();
