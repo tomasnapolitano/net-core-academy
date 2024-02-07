@@ -9,7 +9,7 @@ namespace Utils.Enum
     public enum UserRoleEnum
     {
         Admin = 1,
-        Client = 2,
-        Agent = 3
+        Agent = 2,
+        Client = 3,
     }
 }

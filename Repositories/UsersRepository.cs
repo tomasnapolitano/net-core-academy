@@ -23,20 +23,24 @@ namespace Repositories
         public async Task<List<UserDTO>> GetAllAgent()
         {
             var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
-            if (listAgent == null)
+
+            if (listAgent.Count == 0)
             {
-                throw new KeyNotFoundException("No se encontraron agentes");
+                throw new KeyNotFoundException("No se encontraron agentes en el sistema");
             }
+
             return _mapper.Map<List<UserDTO>>(listAgent);
         }
 
         public async Task<int> GetRoleById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+
             if(user == null)
             {
                 throw new KeyNotFoundException("No se encontró el usuario");
             }
+
             return user.RoleId;
         }
 
@@ -55,6 +59,7 @@ namespace Repositories
         public async Task<UserDTO> GetUserById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+
             if (user == null)
             {
                 throw new KeyNotFoundException("No se encontró el usuario.");
