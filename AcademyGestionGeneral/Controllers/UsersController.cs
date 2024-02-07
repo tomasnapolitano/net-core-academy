@@ -69,5 +69,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _usersService.PostUser(userId , userCreationDTO);
         }
+
+        // GET: api/Users/Agents
+        /// <summary>
+        /// Obtiene todos los agentes del sistema
+        /// </summary>
+        /// <returns>Lista de UserDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("Agents")]
+        public List<UserDTO> GetAllAgents()
+        {
+            return _usersService.GetAllAgents();
+        }
     }
 }
