@@ -1,10 +1,13 @@
-﻿using Models.DTOs.User;
-using Models.Entities;
+using Models.DTOs.User;
 
 namespace Repositories.Interfaces
 {
     public interface IUsersRepository
     {
+
+        Task<UserDTO> PostUser (UserCreationDTO userCreationDTO , int userRole);
+        Task<int> GetRoleById(int id);
         Task<List<UserDTO>> GetUsers();
+
     }
 }

@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.User;
-using Models.Entities;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -28,6 +27,17 @@ namespace AcademyGestionGeneral.Controllers
         public List<UserDTO> GetUsers()
         {
             return _usersService.GetUsers();
+        }
+        /// <summary>
+        ///  Crear un nuevo usuario (Agente o Cliente), dependiendo el usuario recibido por argumento.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="userCreationDTO"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public UserDTO PostUser(int userId , UserCreationDTO userCreationDTO)
+        {
+            return _usersService.PostUser(userId , userCreationDTO);
         }
     }
 }
