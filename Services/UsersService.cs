@@ -15,6 +15,11 @@ namespace Services
             _usersRepository = usersRepository;
         }
 
+        public List<UserDTO> GetAllAgents()
+        {
+            return _usersRepository.GetAllAgent().Result;
+        }
+
         public List<UserDTO> GetUsers()
         {
             return _usersRepository.GetUsers().Result;

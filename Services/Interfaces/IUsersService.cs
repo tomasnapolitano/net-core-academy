@@ -6,5 +6,6 @@ namespace Services.Interfaces
     { 
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
         List<UserDTO> GetUsers();
+        List<UserDTO> GetAllAgents();
     }
 }
