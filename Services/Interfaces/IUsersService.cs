@@ -4,8 +4,10 @@ namespace Services.Interfaces
 {
     public interface IUsersService
     { 
-        UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
+        UserDTO GetUserById(int id);
         List<UserDTO> GetUsers();
         List<UserDTO> GetAllAgents();
+        List<UserDTO> GetUsersWithFullName();
+        UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
     }
 }

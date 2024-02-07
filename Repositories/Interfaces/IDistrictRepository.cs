@@ -6,5 +6,6 @@ namespace Repositories.Interfaces
     public interface IDistrictRepository
     {
         Task<List<DistrictDTO>> GetDistricts();
+        Task<DistrictDTO> GetDistrictById(int id);
     }
 }

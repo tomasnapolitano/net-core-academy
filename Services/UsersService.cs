@@ -14,15 +14,25 @@ namespace Services
         {
             _usersRepository = usersRepository;
         }
-
         public List<UserDTO> GetAllAgents()
         {
             return _usersRepository.GetAllAgent().Result;
         }
 
+        public UserDTO GetUserById(int id)
+        {
+            return _usersRepository.GetUserById(id).Result;
+
+        }
+
         public List<UserDTO> GetUsers()
         {
             return _usersRepository.GetUsers().Result;
+        }
+
+        public List<UserDTO> GetUsersWithFullName()
+        {
+            return _usersRepository.GetUsersWithFullName().Result;
         }
 
         public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
