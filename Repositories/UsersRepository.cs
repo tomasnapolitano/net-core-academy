@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
+using System.Net.Mail;
+using System.Net;
 using Utils.Enum;
 
 namespace Repositories
@@ -129,7 +131,24 @@ namespace Repositories
 
             };
             return userDTO;
+        }
 
+        public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO)
+        {
+            var existingUser = await _context.Users.FindAsync(userUpdateDTO.UserId);
+
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
+            }
+
+            existingUser.FirstName = userUpdateDTO.FirstName;
+            existingUser.LastName = userUpdateDTO.LastName;
+            existingUser.Email = userUpdateDTO.Email;
+
+            await _context.SaveChangesAsync();
+
+            return await GetUserById(existingUser.UserId);
         }
     }
 }
