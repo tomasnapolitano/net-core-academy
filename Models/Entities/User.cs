@@ -22,7 +22,6 @@ namespace Models.Entities
         public string Password { get; set; } = null!;
         public DateTime CreationDate { get; set; }
         public bool? IsConfirmed { get; set; }
-
         public virtual Address Adress { get; set; } = null!;
         public virtual UserRole Role { get; set; } = null!;
         public virtual ICollection<ConsumptionBill> ConsumptionBills { get; set; }

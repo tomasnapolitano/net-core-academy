@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
+using System.Net.Mail;
+using System.Net;
 using Utils.Enum;
 
 namespace Repositories
@@ -21,20 +23,24 @@ namespace Repositories
         public async Task<List<UserDTO>> GetAllAgent()
         {
             var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
-            if (listAgent == null)
+
+            if (listAgent.Count == 0)
             {
-                throw new KeyNotFoundException("No se encontraron agentes");
+                throw new KeyNotFoundException("No se encontraron agentes en el sistema");
             }
+
             return _mapper.Map<List<UserDTO>>(listAgent);
         }
 
         public async Task<int> GetRoleById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+
             if(user == null)
             {
                 throw new KeyNotFoundException("No se encontró el usuario");
             }
+
             return user.RoleId;
         }
 
@@ -53,6 +59,7 @@ namespace Repositories
         public async Task<UserDTO> GetUserById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+
             if (user == null)
             {
                 throw new KeyNotFoundException("No se encontró el usuario.");
@@ -129,7 +136,24 @@ namespace Repositories
 
             };
             return userDTO;
+        }
 
+        public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO)
+        {
+            var existingUser = await _context.Users.FindAsync(userUpdateDTO.UserId);
+
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
+            }
+
+            existingUser.FirstName = userUpdateDTO.FirstName;
+            existingUser.LastName = userUpdateDTO.LastName;
+            existingUser.Email = userUpdateDTO.Email;
+
+            await _context.SaveChangesAsync();
+
+            return await GetUserById(existingUser.UserId);
         }
     }
 }
