@@ -7,5 +7,6 @@ namespace Services.Interfaces
     {
         List<ServiceDTO> GetServices();
         List<ServiceTypeDTO> GetServiceTypes();
+        ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO);
     }
 }

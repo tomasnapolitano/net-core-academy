@@ -28,5 +28,10 @@ namespace Services
         {
             return _serviceRepository.GetServiceTypes().Result;
         }
+
+        public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
+        {
+            return _serviceRepository.PostService(serviceCreationDTO).Result;
+        }
     }
 }
