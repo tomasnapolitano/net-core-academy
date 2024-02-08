@@ -29,6 +29,20 @@ namespace AcademyGestionGeneral.Controllers
             return _serviceService.GetServices();
         }
 
+        // GET: api/Service/{id}
+        /// <summary>
+        /// Obtiene un servicio específico
+        /// </summary>
+        /// <returns>Servicio</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("{id}")]
+        public ServiceDTO GetServiceById(int id)
+        {
+            return _serviceService.GetServiceById(id);
+        }
+
         // GET: api/ServiceTypes
         /// <summary>
         /// Obtiene todos los Tipos de Servicios
