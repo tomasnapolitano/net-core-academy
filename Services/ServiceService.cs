@@ -28,6 +28,11 @@ namespace Services
             return _serviceRepository.GetServiceTypes().Result;
         }
 
+        public ServiceTypeDTO GetServiceTypeById(int id)
+        {
+            return _serviceRepository.GetServiceTypeById(id).Result;
+        }
+
         public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
         {
             return _serviceRepository.PostService(serviceCreationDTO).Result;
