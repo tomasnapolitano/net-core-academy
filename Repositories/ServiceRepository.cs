@@ -41,6 +41,18 @@ namespace Repositories
             return _mapper.Map<List<ServiceTypeDTO>>(serviceTypes);
         }
 
+        public async Task<ServiceTypeDTO> GetServiceTypeById(int id)
+        {
+            var serviceType = await _context.ServiceTypes.Where(x => x.ServiceTypeId == id).FirstOrDefaultAsync();
+
+            if (serviceType == null)
+            {
+                throw new KeyNotFoundException($"No se encontró tipo de servicio con el Id: {id}");
+            }
+
+            return _mapper.Map<ServiceTypeDTO>(serviceType);
+        }
+
         public async Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO)
         {
             var serviceType = await _context.ServiceTypes.Where(x =>
