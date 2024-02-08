@@ -23,6 +23,11 @@ namespace Services
             return _serviceRepository.GetServiceById(id).Result;
         }
 
+        public ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO)
+        {
+            return _serviceRepository.UpdateService(serviceUpdateDTO).Result;
+        }
+
         public List<ServiceTypeDTO> GetServiceTypes()
         {
             return _serviceRepository.GetServiceTypes().Result;
