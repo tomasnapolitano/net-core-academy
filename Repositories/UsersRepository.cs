@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
-using System.Net.Mail;
-using System.Net;
 using Utils.Enum;
 
 namespace Repositories

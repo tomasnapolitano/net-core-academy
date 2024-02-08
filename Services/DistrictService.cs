@@ -1,5 +1,4 @@
 ﻿using Models.DTOs.District;
-using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
 

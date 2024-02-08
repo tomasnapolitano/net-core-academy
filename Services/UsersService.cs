@@ -53,7 +53,6 @@ namespace Services
             {
                 throw new BadRequestException("El id usuario enviado por parametro no puede crear usuarios. No es ADMIN/AGENTE");
             }
-
         }
         public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
         {

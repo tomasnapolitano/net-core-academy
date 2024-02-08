@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Service;
-using Models.Entities;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
