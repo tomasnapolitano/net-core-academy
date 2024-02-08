@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Service;
+using Models.DTOs.User;
+using Services;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -85,6 +87,20 @@ namespace AcademyGestionGeneral.Controllers
         public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
         {
             return _serviceService.PostService(serviceCreationDTO);
+        }
+
+        // PUT: api/Service/{id}
+        /// <summary>
+        /// Actualiza los datos de un Servicio
+        /// </summary>
+        /// <returns>Servicio actualizado</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut]
+        public ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO)
+        {
+            return _serviceService.UpdateService(serviceUpdateDTO);
         }
     }
 }
