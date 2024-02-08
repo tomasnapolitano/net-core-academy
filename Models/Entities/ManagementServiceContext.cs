@@ -94,6 +94,11 @@ namespace Models.Entities
                 entity.ToTable("District");
 
                 entity.Property(e => e.DistrictName).HasMaxLength(255);
+
+                entity.HasOne(d => d.Agent)
+                    .WithMany(p => p.Districts)
+                    .HasForeignKey(d => d.AgentId)
+                    .HasConstraintName("FK__District__AgentI__5FB337D6");
             });
 
             modelBuilder.Entity<DistrictXservice>(entity =>
