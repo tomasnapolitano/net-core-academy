@@ -18,6 +18,11 @@ namespace Services
             return _serviceRepository.GetServices().Result;
         }
 
+        public ServiceDTO GetServiceById(int id)
+        {
+            return _serviceRepository.GetServiceById(id).Result;
+        }
+
         public List<ServiceTypeDTO> GetServiceTypes()
         {
             return _serviceRepository.GetServiceTypes().Result;
