@@ -5,6 +5,7 @@ namespace Repositories.Interfaces
     public interface IServiceRepository
     {
         Task<List<ServiceDTO>> GetServices();
+        Task<ServiceDTO> GetServiceById(int id);
         Task<List<ServiceTypeDTO>> GetServiceTypes();
         Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO);
     }
