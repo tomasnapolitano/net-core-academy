@@ -36,7 +36,7 @@ namespace Repositories
 
             if(user == null)
             {
-                throw new KeyNotFoundException("No se encontró el usuario");
+                throw new KeyNotFoundException($"No se encontró el usuario con rol id igual a :{id}");
             }
 
             return user.RoleId;
@@ -88,6 +88,21 @@ namespace Repositories
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
         {
+            if (ExistsDniUser(userCreationDTO.Dninumber).Result)
+            {
+                throw new KeyNotFoundException($"El DNI ingresado ya existe, no puede crear un usuario con DNI: {userCreationDTO.Dninumber}");
+            }
+
+            if (ExistsEmailUser(userCreationDTO.Email).Result)
+            {
+                throw new KeyNotFoundException($"El Email ingresado ya existe, no puede crear un usuario con Email: {userCreationDTO.Email}");
+            }
+
+            if (!ExistsUserRole(userCreationDTO.RoleId).Result)
+            {
+                throw new KeyNotFoundException($"No se puede crear un usuario con un Id Role que no existe en el sistema: {userCreationDTO.RoleId}");
+            }
+
             var location = await _context.Locations.Where(x => x.PostalCode == userCreationDTO.PostalCode && x.DistrictId == userCreationDTO.DistrictId).FirstOrDefaultAsync();
 
             if (location == null)
@@ -152,6 +167,18 @@ namespace Repositories
             await _context.SaveChangesAsync();
 
             return await GetUserById(existingUser.UserId);
+        }
+        private async Task<bool> ExistsDniUser(string dni)
+        {
+            return await _context.Users.AnyAsync(x=> x.Dninumber == dni);
+        }
+        private async Task<bool> ExistsEmailUser(string email)
+        {
+            return await _context.Users.AnyAsync(x => x.Email == email);
+        }
+        private async Task<bool> ExistsUserRole(int role)
+        {
+            return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
         }
     }
 }
