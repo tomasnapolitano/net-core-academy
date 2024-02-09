@@ -283,5 +283,30 @@ namespace AcademyGestionGeneral_XUnitTest
             Assert.NotNull(result);
             Assert.Equal(this._managementContextFake.Users.ToList().Count, result.Count);
         }
+
+        /// <summary>
+        /// Excepcion al intentar actualizar los datos de un usuario que no existe
+        /// </summary>
+        [Fact]
+        public void PutUser_ReturnsExceptionUserId()
+        {
+            //Arrange
+            var updateUser = new UserUpdateDTO()
+            {
+                UserId = 9999,
+                FirstName = "Test",
+                LastName = "Test",
+                Email = "test@test.com",
+            };
+
+            var errorMessageExpected = $"No se encontró un usuario con el Id ingresado.";
+
+            //Act
+            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.UpdateUser(updateUser));
+            var innerException = aggregateException.InnerException;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, innerException?.Message);
+        }
     }    
 }
