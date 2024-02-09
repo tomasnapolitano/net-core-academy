@@ -19,6 +19,7 @@ namespace Repositories.Utils
             CreateMap<Service, ServiceDTO>();
             CreateMap<ServiceDTO, Service>(); 
             CreateMap<ServiceCreationDTO, Service>(); 
+            CreateMap<ServiceUpdateDTO, Service>(); 
 
             CreateMap<ServiceType, ServiceTypeDTO>();
             CreateMap<ServiceTypeDTO, ServiceType>();

@@ -41,6 +41,22 @@ namespace Repositories
             return _mapper.Map<ServiceDTO>(service);
         }
 
+        public async Task<ServiceDTO> UpdateService(ServiceUpdateDTO serviceUpdateDTO)
+        {
+            var updatedService = _mapper.Map<Service>(serviceUpdateDTO);
+            var existingService = await _context.Services.FindAsync(updatedService.ServiceId);
+
+            if (existingService == null)
+            {
+                throw new KeyNotFoundException($"No se encontró servicio con el Id: {serviceUpdateDTO.ServiceId}");
+            }
+
+            _context.Entry(existingService).CurrentValues.SetValues(updatedService);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ServiceDTO>(updatedService);
+        }
+
         public async Task<List<ServiceTypeDTO>> GetServiceTypes()
         {
             var serviceTypes = await _context.ServiceTypes.ToListAsync();
