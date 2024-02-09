@@ -6,6 +6,5 @@ namespace Models.DTOs.District
     {
         public int DistrictId { get; set; }
         public string DistrictName { get; set; } = null!;
-        public UserDTO? Agent { get; set; }
     }
 }
