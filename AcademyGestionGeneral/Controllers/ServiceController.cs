@@ -102,5 +102,18 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _serviceService.UpdateService(serviceUpdateDTO);
         }
+
+        // DELETE: api/Service/{id}
+        /// <summary>
+        /// Elimina un Servicio
+        /// </summary>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpDelete("{id}")]
+        public bool DeleteService(int id)
+        {
+            return _serviceService.DeleteService(id);
+        }
     }
 }

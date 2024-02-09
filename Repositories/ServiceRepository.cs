@@ -57,6 +57,20 @@ namespace Repositories
             return _mapper.Map<ServiceDTO>(updatedService);
         }
 
+        public async Task<bool> DeleteService(int id)
+        {
+            var service = GetServiceById(id);
+
+            if (service == null)
+            {
+                throw new KeyNotFoundException($"No se encontró servicio con el Id: {id}");
+            }
+
+            _context.Remove(service);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<ServiceTypeDTO>> GetServiceTypes()
         {
             var serviceTypes = await _context.ServiceTypes.ToListAsync();

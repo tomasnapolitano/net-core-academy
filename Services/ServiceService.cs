@@ -28,6 +28,11 @@ namespace Services
             return _serviceRepository.UpdateService(serviceUpdateDTO).Result;
         }
 
+        public bool DeleteService(int id)
+        {
+            return _serviceRepository.DeleteService(id).Result;
+        }
+
         public List<ServiceTypeDTO> GetServiceTypes()
         {
             return _serviceRepository.GetServiceTypes().Result;
