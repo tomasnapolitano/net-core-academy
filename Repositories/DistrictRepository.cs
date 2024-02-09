@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.District;
+using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
+using Utils.Enum;
+using Utils.Middleware;
 
 namespace Repositories
 {
@@ -43,5 +46,23 @@ namespace Repositories
             return _mapper.Map<DistrictDTO>(district);
         }
 
+        public async Task<DistrictAgentDTO> GetDistrictsWithAgent(int districtId)
+        {
+            var district = await _context.Districts
+                                        .Include(d => d.Agent)
+                                        .FirstOrDefaultAsync(x => x.DistrictId == districtId);
+
+            if (district == null)
+            {
+                throw new KeyNotFoundException("No se encontró el distrito.");
+            }
+
+            if (district.AgentId == null)
+            {
+                throw new BadRequestException("El distrito no posee agente/s a cargo.");
+            }
+
+            return _mapper.Map<DistrictAgentDTO>(district);
+        }
     }
 }

@@ -59,6 +59,21 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetUserById(id);
         }
 
+        // GET: api/Users/Agents/5
+        /// <summary>
+        /// Obtiene un agente con sus respectivos distritos
+        /// </summary>
+        /// <param name="agentId">Es el id del agente</param>
+        /// <returns>AgentDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("Agents/{agentId}")]
+        public AgentDTO GetAgentsWithDistrict(int agentId)
+        {
+            return _usersService.GetAgentsWithDistrict(agentId);
+        }
+
         /// <summary>
         ///  Crear un nuevo usuario (Agente o Cliente), dependiendo el usuario recibido por argumento.
         /// </summary>

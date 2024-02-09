@@ -4,6 +4,7 @@ using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using Utils.Enum;
+using Utils.Middleware;
 
 namespace Repositories
 {
@@ -56,9 +57,7 @@ namespace Repositories
 
         public async Task<UserDTO> GetUserById(int id)
         {
-            var user = await _context.Users
-                                    .Include(d => d.Districts)
-                                    .FirstOrDefaultAsync(x => x.UserId == id);
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
 
             if (user == null)
             {
@@ -67,6 +66,25 @@ namespace Repositories
 
             return _mapper.Map<UserDTO>(user);
 
+        }
+        
+        public async Task<AgentDTO> GetAgentsWithDistrict(int agentId)
+        {
+            var user = await _context.Users
+                                    .Include(d => d.Districts)
+                                    .FirstOrDefaultAsync(x => x.UserId == agentId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+
+            if (user.RoleId != (int)UserRoleEnum.Agent)
+            {
+                throw new BadRequestException("El usuario no posee rol de agente.");
+            }
+
+            return _mapper.Map<AgentDTO>(user);
         }
 
         public async Task<List<UserDTO>> GetUsersWithFullName()
@@ -170,6 +188,7 @@ namespace Repositories
 
             return await GetUserById(existingUser.UserId);
         }
+
         private async Task<bool> ExistsDniUser(string dni)
         {
             return await _context.Users.AnyAsync(x=> x.Dninumber == dni);
