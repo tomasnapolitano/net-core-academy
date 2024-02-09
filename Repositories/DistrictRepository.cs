@@ -31,14 +31,17 @@ namespace Repositories
 
         public async Task<DistrictDTO> GetDistrictById(int id)
         {
-            var district = await _context.Districts.FirstOrDefaultAsync(x => x.DistrictId == id);
+            var district = await _context.Districts
+                                        .Include(d => d.Agent) 
+                                        .FirstOrDefaultAsync(x => x.DistrictId == id);
 
             if (district == null)
             {
-                throw new KeyNotFoundException("No se encontro el distrito.");
+                throw new KeyNotFoundException("No se encontró el distrito.");
             }
 
             return _mapper.Map<DistrictDTO>(district);
         }
+
     }
 }
