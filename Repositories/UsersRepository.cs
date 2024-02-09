@@ -56,7 +56,9 @@ namespace Repositories
 
         public async Task<UserDTO> GetUserById(int id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            var user = await _context.Users
+                                    .Include(d => d.Districts)
+                                    .FirstOrDefaultAsync(x => x.UserId == id);
 
             if (user == null)
             {
@@ -73,11 +75,11 @@ namespace Repositories
                                             {
                                                 UserId = x.UserId,
                                                 RoleId = x.RoleId,
-                                                AdressId = x.AdressId,
+                                                AddressId = x.AdressId,
                                                 FirstName = x.FirstName,
                                                 LastName = x.LastName,
                                                 Email = x.Email,
-                                                Dninumber = x.Dninumber,
+                                                DniNumber = x.Dninumber,
                                                 CreationDate = x.CreationDate,
                                                 FullName = x.FirstName + ' ' + x.LastName
                                             })
@@ -125,11 +127,11 @@ namespace Repositories
             {
                 UserId = user.UserId,
                 RoleId = user.RoleId,
-                AdressId = user.AdressId,
+                AddressId = user.AdressId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
-                Dninumber = user.Dninumber,
+                DniNumber = user.Dninumber,
                 CreationDate = user.CreationDate,
 
             };

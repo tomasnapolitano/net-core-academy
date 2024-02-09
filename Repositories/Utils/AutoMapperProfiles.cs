@@ -10,11 +10,16 @@ namespace Repositories.Utils
     {
         public AutoMapperProfiles()
         {
-            CreateMap<UserDTO, User>();
-            CreateMap<User, UserDTO>();
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => $"{src.FirstName} {src.LastName}"))
+                .ForMember(dest => dest.Districts, opt => opt.MapFrom(src => src.Districts.Select(d => new DistrictDTO { DistrictId = d.DistrictId, DistrictName = d.DistrictName }).ToList()));
 
-            CreateMap<DistrictDTO, District>();
+            CreateMap<UserDTO, User>()
+                .ForMember(dest => dest.Districts, opt => opt.Ignore());
+
+
             CreateMap<District, DistrictDTO>();
+            CreateMap<DistrictDTO, District>();
 
             CreateMap<Service, ServiceDTO>();
             CreateMap<ServiceDTO, Service>(); 
