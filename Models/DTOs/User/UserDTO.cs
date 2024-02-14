@@ -13,5 +13,6 @@ namespace Models.DTOs.User
         public string DniNumber { get; set; } = null!;
         public DateTime CreationDate { get; set; }
         public string FullName { get; set; } = null!;
+        public string Active { get; set; } = null!;
     }
 }
