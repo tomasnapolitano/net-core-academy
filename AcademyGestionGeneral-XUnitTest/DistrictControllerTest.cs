@@ -1,11 +1,13 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Models.DTOs.User;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using Models.Entities;
 using Repositories;
 using Repositories.Utils;
 using Services;
+using Sprache;
 using Utils.Middleware;
 
 namespace AcademyGestionGeneral_XUnitTest
@@ -57,12 +59,14 @@ namespace AcademyGestionGeneral_XUnitTest
 
             var location = new List<Location>()
             {
-                new Location() { LocationId = 1 , LocationName = "Ramos mejia" , PostalCode = "B1704"  , DistrictId = 1}
+                new Location() { LocationId = 1 , LocationName = "Ramos mejia" , PostalCode = "B1704"  , DistrictId = 1},
+                new Location() { LocationId = 2 , LocationName = "3 de febrero" , PostalCode = "B1905"  , DistrictId = 2}
             };
 
             var district = new List<District>()
             {
-                new District() { DistrictId = 1  , DistrictName = "Matanza" , AgentId = null} 
+                new District() { DistrictId = 1  , DistrictName = "Matanza" , AgentId = null},
+                new District() { DistrictId = 2  , DistrictName = "San Martin" , AgentId = 2}
             };
 
             _managementContextFake.Users.AddRange(users);
@@ -87,6 +91,42 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
+        /// Este metodo prueba listado vacio de Distritos
+        /// </summary>
+        /// <remarks>
+        /// se crea un contexto sin conexion a la base de datos ;
+        /// </remarks>
+        [Fact]
+        public void GetDistricts_GetList_EmptyResult()
+        {
+            //Arrange
+            var errorMessageExpected = "La lista de distritos está vacía.";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Arrange
+            var options2 = new DbContextOptionsBuilder<ManagementServiceContext>()
+           .UseInMemoryDatabase(databaseName: $"InventoryDBMemory-{Guid.NewGuid()}")
+            .Options;
+
+            _managementContextFake = new ManagementServiceContext(options2);
+            //GenerateDB();
+
+            var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
+            var mapper = mapConfig.CreateMapper();
+
+            var districtRepository = new DistrictRepository(_managementContextFake, mapper);
+            var districtService = new DistrictService(districtRepository);
+            _districtController = new DistrictController(districtService);
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.GetDistricts());
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
+        }
+
+        /// <summary>
         /// Este metodo prueba buscar un distrito por id
         /// </summary>
         [Fact]
@@ -104,7 +144,26 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
-        /// Obtener una lista de todos los agentes del sistema
+        /// Este metodo prueba buscar id no existente de District
+        /// </summary>
+        [Fact]
+        public void GetByIdDistrict_ReturnsInCorrectDistrict()
+        {
+            //Arrange
+            var districtId = 1995;
+            var errorMessageExpected = "No se encontró el distrito.";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.GetDistrictById(districtId));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
+        }
+
+        /// <summary>
+        /// Obtiene un distrito con su respectivo agente
         /// </summary>
         [Fact]
         public void GetListDistrictsWithAgents_ReturnsOk()
@@ -115,23 +174,28 @@ namespace AcademyGestionGeneral_XUnitTest
             //Act
             var result = _districtController.GetDistrictsWithAgent(districtId);
 
-            //Assert            
-            Assert.NotNull(result);
-            Assert.Equal(this._managementContextFake.Districts.ToList().Count, result.Count);
+            //Assert           
+            Assert.Equal(districtId, result.DistrictId);
+            Assert.False(result == null);
         }
 
         /// <summary>
-        /// Obtener una lista de todos usuario con su nombre completo
+        /// Este metodo prueba buscar id de distrito sin agente existente
         /// </summary>
         [Fact]
-        public void GetListUserFullName_ReturnsOk()
+        public void GetListDistrictsWithAgents_ReturnsInCorrectDistrict()
         {
-            //Act
-            var result = _districtController.GetDistrictsWithAgent(districtId);
+            //Arrange
+            var districtId = 1;
+            var errorMessageExpected = "El distrito no posee agente/s a cargo.";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
 
-            //Assert            
-            Assert.NotNull(result);
-            Assert.Equal(this._managementContextFake.Users.ToList().Count, result.Count);
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.GetDistrictsWithAgent(districtId));
+            var badRequestException = exception.InnerException is BadRequestException ? exception.InnerException as BadRequestException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, badRequestException?.Message);
         }
     }    
 }
