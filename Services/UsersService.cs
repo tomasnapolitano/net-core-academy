@@ -1,4 +1,5 @@
 using Models.DTOs.User;
+using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using Utils.Enum;
@@ -66,6 +67,20 @@ namespace Services
         public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
         {
             return _usersRepository.UpdateUser(userUpdateDTO).Result;
+        }
+
+        public UserDTO DeleteUser( int adminId , int id)
+        {
+            var userRole = _usersRepository.GetRoleById(adminId).Result;
+
+            if (userRole == (int)UserRoleEnum.Admin)
+            {
+                return _usersRepository.DeleteUser(id).Result;
+            }
+            else
+            {
+                throw new BadRequestException("El id usuario enviado por parametro no puede eliminar usuarios. No es ADMIN");
+            }
         }
     }
 }
