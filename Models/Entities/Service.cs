@@ -11,6 +11,7 @@
         public int ServiceTypeId { get; set; }
         public string ServiceName { get; set; } = null!;
         public double PricePerUnit { get; set; }
+        public bool? Status { get; set; }
 
         public virtual ServiceType ServiceType { get; set; } = null!;
         public virtual ICollection<DistrictXservice> DistrictXservices { get; set; }

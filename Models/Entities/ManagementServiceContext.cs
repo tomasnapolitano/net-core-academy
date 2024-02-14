@@ -107,6 +107,8 @@ namespace Models.Entities
 
                 entity.Property(e => e.DistrictXserviceId).HasColumnName("DistrictXServiceId");
 
+                entity.Property(e => e.Status).HasColumnName("status");
+
                 entity.HasOne(d => d.District)
                     .WithMany(p => p.DistrictXservices)
                     .HasForeignKey(d => d.DistrictId)
@@ -148,6 +150,8 @@ namespace Models.Entities
                 entity.ToTable("Service");
 
                 entity.Property(e => e.ServiceName).HasMaxLength(255);
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.ServiceType)
                     .WithMany(p => p.Services)
@@ -204,6 +208,8 @@ namespace Models.Entities
                 entity.Property(e => e.LastName).HasMaxLength(100);
 
                 entity.Property(e => e.Password).HasMaxLength(100);
+
+                entity.Property(e => e.Status).HasColumnName("status");
 
                 entity.HasOne(d => d.Address)
                     .WithMany(p => p.Users)
