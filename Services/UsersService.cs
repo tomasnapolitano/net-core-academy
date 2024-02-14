@@ -24,6 +24,11 @@ namespace Services
             return _usersRepository.GetUserById(id).Result;
         }
 
+        public List<UserDTO> GetUsersByDistrictId(int districtId)
+        {
+            return _usersRepository.GetUsersByDistrictId(districtId).Result;
+        }
+
         public AgentDTO GetAgentsWithDistrict(int agentId)
         {
             return _usersRepository.GetAgentsWithDistrict(agentId).Result;

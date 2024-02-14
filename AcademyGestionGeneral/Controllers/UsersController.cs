@@ -59,6 +59,21 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetUserById(id);
         }
 
+        // GET: api/Users/byDistrict/5
+        /// <summary>
+        /// Obtiene una lista de usuarios de un distrito en especifico
+        /// </summary>
+        /// <param name="districtId">Es el id del distrito</param>
+        /// <returns>Lista de UsuarioDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("Districts/{districtId}")]
+        public List<UserDTO> GetUsersByDistrictId(int districtId)
+        {
+            return _usersService.GetUsersByDistrictId(districtId);
+        }
+
         // GET: api/Users/Agents/5
         /// <summary>
         /// Obtiene un agente con sus respectivos distritos

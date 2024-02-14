@@ -67,7 +67,33 @@ namespace Repositories
             return _mapper.Map<UserDTO>(user);
 
         }
-        
+
+        public async Task<List<UserDTO>> GetUsersByDistrictId(int districtId)
+        {
+            var district = await _context.Districts
+                                        .Include(d => d.Locations)
+                                        .ThenInclude(l => l.Addresses)
+                                        .ThenInclude(a => a.Users)
+                                        .FirstOrDefaultAsync(d => d.DistrictId == districtId);
+
+            if (district == null)
+            {
+                throw new KeyNotFoundException($"No se encontró el distrito con ID {districtId}.");
+            }
+
+            var users = district.Locations
+                                .SelectMany(l => l.Addresses)
+                                .SelectMany(a => a.Users)
+                                .ToList();
+
+            if (users.Count == 0)
+            {
+                throw new KeyNotFoundException("No se encontraron usuarios en el distrito especificado.");
+            }
+
+            return _mapper.Map<List<UserDTO>>(users);
+        }
+
         public async Task<AgentDTO> GetAgentsWithDistrict(int agentId)
         {
             var user = await _context.Users
@@ -93,7 +119,7 @@ namespace Repositories
                                             {
                                                 UserId = x.UserId,
                                                 RoleId = x.RoleId,
-                                                AddressId = x.AdressId,
+                                                AdressId = x.AdressId,
                                                 FirstName = x.FirstName,
                                                 LastName = x.LastName,
                                                 Email = x.Email,
@@ -160,7 +186,7 @@ namespace Repositories
             {
                 UserId = user.UserId,
                 RoleId = user.RoleId,
-                AddressId = user.AdressId,
+                AdressId = user.AdressId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
