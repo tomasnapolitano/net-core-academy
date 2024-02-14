@@ -7,6 +7,7 @@ namespace Services.Interfaces
         UserDTO GetUserById(int id);
         AgentDTO GetAgentsWithDistrict(int agentId);
         List<UserDTO> GetUsers();
+        List<UserDTO> GetUsersByDistrictId(int districtId);
         List<UserDTO> GetAllAgents();
         List<UserDTO> GetUsersWithFullName();
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
