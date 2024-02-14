@@ -128,5 +128,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _usersService.UpdateUser(userUpdateDTO);
         }
+
+        // DELETE: api/Users/1
+        /// <summary>
+        /// Dar de baja un usuario
+        /// </summary>
+        /// <returns>UserDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpDelete("{id}")]
+        public UserDTO DeleteUser(int userAdminId , int id)
+        {
+            return _usersService.DeleteUser(userAdminId , id);
+        }
     }
 }
