@@ -205,9 +205,9 @@ namespace Models.Entities
 
                 entity.Property(e => e.Password).HasMaxLength(100);
 
-                entity.HasOne(d => d.Adress)
+                entity.HasOne(d => d.Address)
                     .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.AdressId)
+                    .HasForeignKey(d => d.AddressId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK__User__AdressId__59FA5E80");
 

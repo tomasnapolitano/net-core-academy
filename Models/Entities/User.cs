@@ -12,7 +12,7 @@
 
         public int UserId { get; set; }
         public int RoleId { get; set; }
-        public int AdressId { get; set; }
+        public int AddressId { get; set; }
         public string FirstName { get; set; } = null!;
         public string LastName { get; set; } = null!;
         public string Email { get; set; } = null!;
@@ -21,7 +21,7 @@
         public DateTime CreationDate { get; set; }
         public bool? IsConfirmed { get; set; }
 
-        public virtual Address Adress { get; set; } = null!;
+        public virtual Address Address { get; set; } = null!;
         public virtual UserRole Role { get; set; } = null!;
         public virtual ICollection<ConsumptionBill> ConsumptionBills { get; set; }
         public virtual ICollection<District> Districts { get; set; }

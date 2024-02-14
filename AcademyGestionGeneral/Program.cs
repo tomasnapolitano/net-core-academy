@@ -6,7 +6,9 @@ using NLog.Web;
 //var logger = LogManager.GetCurrentClassLogger();
 //logger.Debug("init main");
 
-var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
+var logger = NLog.LogManager.Setup()
+    .LoadConfigurationFromFile()
+    .GetCurrentClassLogger();
 
 try
 {

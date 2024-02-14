@@ -36,9 +36,9 @@ namespace AcademyGestionGeneral_XUnitTest
         {
             var users = new List<User>
             {
-                new User() { UserId = 1 , FirstName = "Fernando" , LastName = "Alarcon" , Email = "alarcon@test.com" , Password = "TEST19239" , Dninumber = "15151515" , CreationDate = DateTime.Now , AdressId = 1 , RoleId = 1 },
-                new User() { UserId = 2 , FirstName = "Ema" , LastName = "Roffo" , Email = "roffo@test.com" , Password = "TEST19239" , Dninumber = "19181717" , CreationDate = DateTime.Now , AdressId = 2 , RoleId = 2 },
-                new User() { UserId = 3 , FirstName = "Silvio" , LastName = "Romero" , Email = "romero@test.com" , Password = "TEST19239" , Dninumber = "42599687" , CreationDate = DateTime.Now , AdressId = 3 , RoleId = 3 }
+                new User() { UserId = 1 , FirstName = "Fernando" , LastName = "Alarcon" , Email = "alarcon@test.com" , Password = "TEST19239" , Dninumber = "15151515" , CreationDate = DateTime.Now , AddressId = 1 , RoleId = 1 },
+                new User() { UserId = 2 , FirstName = "Ema" , LastName = "Roffo" , Email = "roffo@test.com" , Password = "TEST19239" , Dninumber = "19181717" , CreationDate = DateTime.Now , AddressId = 2 , RoleId = 2 },
+                new User() { UserId = 3 , FirstName = "Silvio" , LastName = "Romero" , Email = "romero@test.com" , Password = "TEST19239" , Dninumber = "42599687" , CreationDate = DateTime.Now , AddressId = 3 , RoleId = 3 }
             };
 
             var role = new List<UserRole>

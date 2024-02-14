@@ -119,7 +119,7 @@ namespace Repositories
                                             {
                                                 UserId = x.UserId,
                                                 RoleId = x.RoleId,
-                                                AdressId = x.AdressId,
+                                                AddressId = x.AddressId,
                                                 FirstName = x.FirstName,
                                                 LastName = x.LastName,
                                                 Email = x.Email,
@@ -170,7 +170,7 @@ namespace Repositories
             var user = new User() 
             {
                 RoleId = userRole,
-                AdressId = addres.AddressId,
+                AddressId = addres.AddressId,
                 FirstName = userCreationDTO.FirstName,
                 LastName = userCreationDTO.LastName,
                 Email = userCreationDTO.Email,
@@ -186,7 +186,7 @@ namespace Repositories
             {
                 UserId = user.UserId,
                 RoleId = user.RoleId,
-                AdressId = user.AdressId,
+                AddressId = user.AddressId,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Email = user.Email,
