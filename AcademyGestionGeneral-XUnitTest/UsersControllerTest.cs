@@ -104,7 +104,7 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
-        /// Agregar un nuevo usuario con datos válidos, con rol de admiinstrador
+        /// Agregar un nuevo usuario con datos válidos, con rol de administrador
         /// </summary>
         [Fact]
         public void PostUser_ReturnsOk()
