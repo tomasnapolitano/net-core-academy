@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.Service;
 using Models.Entities;
 using Repositories.Interfaces;
+using Utils.Middleware;
 
 namespace Repositories
 {
@@ -59,15 +60,24 @@ namespace Repositories
 
         public async Task<bool> DeleteService(int id)
         {
-            var service = GetServiceById(id);
+            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.ServiceId == id);
 
-            if (service == null)
+            if (existingService == null)
             {
                 throw new KeyNotFoundException($"No se encontró servicio con el Id: {id}");
             }
 
-            _context.Remove(service);
+            if (existingService.Active == false)
+            {
+                throw new BadRequestException($"El servicio con el id ( {id} ) ya se encuentra deshabilitado");
+            }
+
+            // Hago la baja lógica poniendo Active en false
+            existingService.Active = false;
+            _context.Entry(existingService).Property(x => x.Active).IsModified = true;
+
             await _context.SaveChangesAsync();
+
             return true;
         }
 
