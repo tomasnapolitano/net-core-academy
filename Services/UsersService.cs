@@ -40,6 +40,11 @@ namespace Services
             return _usersRepository.GetUsers().Result;
         }
 
+        public List<UserDTO> GetActiveUsers()
+        {
+            return _usersRepository.GetActiveUsers().Result;
+        }
+
         public List<UserDTO> GetUsersWithFullName()
         {
             return _usersRepository.GetUsersWithFullName().Result;

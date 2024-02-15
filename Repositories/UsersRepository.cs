@@ -55,6 +55,18 @@ namespace Repositories
             return _mapper.Map<List<UserDTO>>(users);
         }
 
+        public async Task<List<UserDTO>> GetActiveUsers()
+        {
+            var users = await _context.Users.Where(x => x.Active == true).ToListAsync();
+
+            if (users.Count == 0)
+            {
+                throw new KeyNotFoundException("La lista de usuarios activos está vacía.");
+            }
+
+            return _mapper.Map<List<UserDTO>>(users);
+        }
+
         public async Task<UserDTO> GetUserById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
