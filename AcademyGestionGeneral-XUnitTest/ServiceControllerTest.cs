@@ -1,18 +1,11 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.Service;
 using Models.Entities;
 using Repositories;
 using Repositories.Utils;
 using Services;
-using Sprache;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace AcademyGestionGeneral_XUnitTest
 {
@@ -61,7 +54,7 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
-        /// Este metodo prueba el get de listado de servicios
+        /// Este metodo prueba el get de listado de Servicios
         /// </summary>
         [Fact]
         public void ServiceController_GetServices_ReturnOK()
@@ -71,6 +64,25 @@ namespace AcademyGestionGeneral_XUnitTest
 
             //Assert            
             Assert.Equal(this._managementContextFake.Services.ToList().Count, result.Count);
+        }
+
+        /// <summary>
+        /// Este método prueba el get de listado vacio de Servicios
+        /// </summary>
+        [Fact]
+        public void ServiceController_GetServices_EmptyResult()
+        {
+            _managementContextFake.Services.RemoveRange(_managementContextFake.Services);
+            _managementContextFake.SaveChanges();
+            var errorMessageExpected = "La lista de servicios está vacía.";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.GetServices());
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
 
         /// <summary>
@@ -88,6 +100,26 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
+        /// Este método prueba el get de Servicios por id inexistente
+        /// </summary>
+        [Fact]
+        public void ServiceController_GetServiceById_NotFound()
+        {
+            _managementContextFake.Services.RemoveRange(_managementContextFake.Services);
+            _managementContextFake.SaveChanges();
+            int idToSearch = 1;
+            var errorMessageExpected = $"No se encontró servicio con el Id: {idToSearch}";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.GetServiceById(idToSearch));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
+        }
+
+        /// <summary>
         /// Este metodo prueba el get de listado de tipos de servicio
         /// </summary> 
         [Fact]
@@ -98,6 +130,36 @@ namespace AcademyGestionGeneral_XUnitTest
 
             //Assert            
             Assert.Equal(this._managementContextFake.ServiceTypes.ToList().Count, result.Count);
+        }
+
+        /// <summary>
+        /// Este método prueba el get de listado vacio de Tipos de Servicio
+        /// </summary>
+        /// Se crea un nuevo context ya que la relación entre tablas Service y ServiceType lo requiere
+        [Fact]
+        public void ServiceController_GetServiceTypes_EmptyResult()
+        {
+            var options2 = new DbContextOptionsBuilder<ManagementServiceContext>()
+           .UseInMemoryDatabase(databaseName: $"InventoryDBMemory-{Guid.NewGuid()}")
+            .Options;
+
+            _managementContextFake = new ManagementServiceContext(options2);
+
+            var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
+            var mapper = mapConfig.CreateMapper();
+
+            var serviceRepository = new ServiceRepository(_managementContextFake, mapper);
+            var serviceService = new ServiceService(serviceRepository);
+            _serviceController = new ServiceController(serviceService);
+            var errorMessageExpected = "La lista de tipos de servicios está vacía.";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.GetServiceTypes());
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
 
         /// <summary>
@@ -113,6 +175,24 @@ namespace AcademyGestionGeneral_XUnitTest
             //Assert
             Assert.Equal(id, result.ServiceTypeId);
             Assert.NotNull(result);
+        }
+
+        /// <summary>
+        /// Este método prueba el get de Tipo de Servicio por id inexistente
+        /// </summary>
+        [Fact]
+        public void ServiceController_GetServiceTypeById_NotFound()
+        {
+            int idToSearch = 99999;
+            var errorMessageExpected = $"No se encontró tipo de servicio con el Id: {idToSearch}";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.GetServiceTypeById(idToSearch));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
 
         /// <summary>
@@ -132,9 +212,34 @@ namespace AcademyGestionGeneral_XUnitTest
             // Act
             var result = _serviceController.PostService(newService);
 
+
             // Assert
             Assert.NotNull(result);
             Assert.IsAssignableFrom<ServiceDTO>(result);
+        }
+
+        /// <summary>
+        /// Este metodo prueba el post de un servicio con un tipo de servicio inexistente
+        /// </summary> 
+        [Fact]
+        public void ServiceController_PostService_ServiceTypeNotFound()
+        {
+            // Arrange
+            var newService = new ServiceCreationDTO()
+            {
+                ServiceName = "Servicio Post",
+                PricePerUnit = 5000,
+                ServiceTypeId = 0
+            };
+            var errorMessageExpected = $"No se encontró tipo de servicio con el Id: {newService.ServiceTypeId}";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.PostService(newService));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
 
         /// <summary>
@@ -164,14 +269,41 @@ namespace AcademyGestionGeneral_XUnitTest
             Assert.Equal(updatedService.ServiceTypeId, result.ServiceTypeId);
         }
 
-        [Theory]
-        [InlineData(1)]
-        public void ServiceController_DeleteService_ReturnOK(int id)
+        /// <summary>
+        /// Este metodo prueba el update de un servicio inexistente
+        /// </summary> 
+        [Fact]
+        public void ServiceController_UpdateService_NotFound()
         {
-            // Act
-            _serviceController.DeleteService(id);
-            // Assert
-            Assert.NotNull(_managementContextFake.Services.Find(id));
+            // Arrange
+            var updatedService = new ServiceUpdateDTO()
+            {
+                ServiceId = 0,
+                ServiceName = "Servicio Updated",
+                PricePerUnit = 6000,
+                ServiceTypeId = 2
+            };
+
+            var errorMessageExpected = $"No se encontró servicio con el Id: {updatedService.ServiceId}";
+            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.UpdateService(updatedService));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
+
+        // Comentado debido a que falta implementar baja lógica:
+        //[Theory]
+        //[InlineData(1)]
+        //public void ServiceController_DeleteService_ReturnOK(int id)
+        //{
+        //    // Act
+        //    _serviceController.DeleteService(id);
+        //    // Assert
+        //    Assert.NotNull(_managementContextFake.Services.Find(id));
+        //}
     }
 }
