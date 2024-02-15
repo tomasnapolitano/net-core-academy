@@ -16,6 +16,9 @@ namespace Repositories.Utils
             CreateMap<AgentDTO, User>();
             CreateMap<User, AgentDTO>();
 
+            CreateMap<UserUpdateDTO, User>();
+            CreateMap<User, UserUpdateDTO>();
+
             CreateMap<District, DistrictDTO>();
             CreateMap<DistrictDTO, District>();
 
@@ -24,14 +27,13 @@ namespace Repositories.Utils
 
             CreateMap<Service, ServiceDTO>();
             CreateMap<ServiceDTO, Service>(); 
+
             CreateMap<ServiceCreationDTO, Service>(); 
+
             CreateMap<ServiceUpdateDTO, Service>(); 
 
             CreateMap<ServiceType, ServiceTypeDTO>();
             CreateMap<ServiceTypeDTO, ServiceType>();
-
-            CreateMap<UserUpdateDTO, User>();
-            CreateMap<User, UserUpdateDTO>();
         }
     }
 }

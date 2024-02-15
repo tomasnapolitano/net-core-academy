@@ -6,10 +6,10 @@ namespace Services.Interfaces
     {
         List<ServiceDTO> GetServices();
         ServiceDTO GetServiceById(int id);
-        ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO);
-        bool DeleteService(int id);
         List<ServiceTypeDTO> GetServiceTypes();
         ServiceTypeDTO GetServiceTypeById(int id);
         ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO);
+        ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO);
+        bool DeleteService(int id);
     }
 }

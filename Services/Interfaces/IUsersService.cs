@@ -4,13 +4,13 @@ namespace Services.Interfaces
 {
     public interface IUsersService
     { 
-        UserDTO GetUserById(int id);
-        AgentDTO GetAgentsWithDistrict(int agentId);
         List<UserDTO> GetUsers();
         List<UserDTO> GetActiveUsers();
-        List<UserDTO> GetUsersByDistrictId(int districtId);
         List<UserDTO> GetAllAgents();
         List<UserDTO> GetUsersWithFullName();
+        UserDTO GetUserById(int id);
+        AgentDTO GetAgentsWithDistrict(int agentId);
+        List<UserDTO> GetUsersByDistrictId(int districtId);
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO);
         UserDTO DeleteUser(int adminId , int id);

@@ -19,30 +19,6 @@ namespace Repositories
             _mapper = mapper;
         }
 
-        public async Task<List<UserDTO>> GetAllAgent()
-        {
-            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
-
-            if (listAgent.Count == 0)
-            {
-                throw new KeyNotFoundException("No se encontraron agentes en el sistema");
-            }
-
-            return _mapper.Map<List<UserDTO>>(listAgent);
-        }
-
-        public async Task<int> GetRoleById(int id)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
-
-            if(user == null)
-            {
-                throw new KeyNotFoundException($"No se encontró el usuario con rol id igual a :{id}");
-            }
-
-            return user.RoleId;
-        }
-
         public async Task<List<UserDTO>> GetUsers()
         {
             var users = await _context.Users.ToListAsync();
@@ -65,6 +41,49 @@ namespace Repositories
             }
 
             return _mapper.Map<List<UserDTO>>(users);
+        }
+
+        public async Task<List<UserDTO>> GetAllAgent()
+        {
+            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
+
+            if (listAgent.Count == 0)
+            {
+                throw new KeyNotFoundException("No se encontraron agentes en el sistema");
+            }
+
+            return _mapper.Map<List<UserDTO>>(listAgent);
+        }
+
+        public async Task<List<UserDTO>> GetUsersWithFullName()
+        {
+            var users = await _context.Users.Select(x => new UserDTO()
+            {
+                UserId = x.UserId,
+                RoleId = x.RoleId,
+                AddressId = x.AddressId,
+                FirstName = x.FirstName,
+                LastName = x.LastName,
+                Email = x.Email,
+                DniNumber = x.Dninumber,
+                CreationDate = x.CreationDate,
+                FullName = x.FirstName + ' ' + x.LastName
+            })
+                                            .ToListAsync();
+
+            return users;
+        }
+
+        public async Task<int> GetRoleById(int id)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+
+            if(user == null)
+            {
+                throw new KeyNotFoundException($"No se encontró el usuario con rol id igual a :{id}");
+            }
+
+            return user.RoleId;
         }
 
         public async Task<UserDTO> GetUserById(int id)
@@ -123,25 +142,6 @@ namespace Repositories
             }
 
             return _mapper.Map<AgentDTO>(user);
-        }
-
-        public async Task<List<UserDTO>> GetUsersWithFullName()
-        {
-            var users = await _context.Users.Select(x => new UserDTO()
-                                            {
-                                                UserId = x.UserId,
-                                                RoleId = x.RoleId,
-                                                AddressId = x.AddressId,
-                                                FirstName = x.FirstName,
-                                                LastName = x.LastName,
-                                                Email = x.Email,
-                                                DniNumber = x.Dninumber,
-                                                CreationDate = x.CreationDate,
-                                                FullName = x.FirstName + ' ' + x.LastName
-                                            })
-                                            .ToListAsync();
-
-            return users;
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
@@ -227,19 +227,6 @@ namespace Repositories
             return await GetUserById(existingUser.UserId);
         }
 
-        private async Task<bool> ExistsDniUser(string dni)
-        {
-            return await _context.Users.AnyAsync(x=> x.Dninumber == dni);
-        }
-        private async Task<bool> ExistsEmailUser(string email)
-        {
-            return await _context.Users.AnyAsync(x => x.Email == email);
-        }
-        private async Task<bool> ExistsUserRole(int role)
-        {
-            return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
-        }
-
         public async Task<UserDTO> DeleteUser(int id)
         {
             var existingUser = await _context.Users.FindAsync(id);
@@ -253,6 +240,19 @@ namespace Repositories
             await _context.SaveChangesAsync();
 
             return await GetUserById(existingUser.UserId);
+        }
+
+        private async Task<bool> ExistsDniUser(string dni)
+        {
+            return await _context.Users.AnyAsync(x=> x.Dninumber == dni);
+        }
+        private async Task<bool> ExistsEmailUser(string email)
+        {
+            return await _context.Users.AnyAsync(x => x.Email == email);
+        }
+        private async Task<bool> ExistsUserRole(int role)
+        {
+            return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
         }
     }
 }

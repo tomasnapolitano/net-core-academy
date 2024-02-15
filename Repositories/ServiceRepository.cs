@@ -42,45 +42,6 @@ namespace Repositories
             return _mapper.Map<ServiceDTO>(service);
         }
 
-        public async Task<ServiceDTO> UpdateService(ServiceUpdateDTO serviceUpdateDTO)
-        {
-            var updatedService = _mapper.Map<Service>(serviceUpdateDTO);
-            var existingService = await _context.Services.FindAsync(updatedService.ServiceId);
-
-            if (existingService == null)
-            {
-                throw new KeyNotFoundException($"No se encontró servicio con el Id: {serviceUpdateDTO.ServiceId}");
-            }
-
-            _context.Entry(existingService).CurrentValues.SetValues(updatedService);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<ServiceDTO>(updatedService);
-        }
-
-        public async Task<bool> DeleteService(int id)
-        {
-            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.ServiceId == id);
-
-            if (existingService == null)
-            {
-                throw new KeyNotFoundException($"No se encontró servicio con el Id: {id}");
-            }
-
-            if (existingService.Active == false)
-            {
-                throw new BadRequestException($"El servicio con el id ( {id} ) ya se encuentra deshabilitado");
-            }
-
-            // Hago la baja lógica poniendo Active en false
-            existingService.Active = false;
-            _context.Entry(existingService).Property(x => x.Active).IsModified = true;
-
-            await _context.SaveChangesAsync();
-
-            return true;
-        }
-
         public async Task<List<ServiceTypeDTO>> GetServiceTypes()
         {
             var serviceTypes = await _context.ServiceTypes.ToListAsync();
@@ -120,6 +81,45 @@ namespace Repositories
             await _context.SaveChangesAsync();
 
             return _mapper.Map<ServiceDTO>(service);
+        }
+
+        public async Task<ServiceDTO> UpdateService(ServiceUpdateDTO serviceUpdateDTO)
+        {
+            var updatedService = _mapper.Map<Service>(serviceUpdateDTO);
+            var existingService = await _context.Services.FindAsync(updatedService.ServiceId);
+
+            if (existingService == null)
+            {
+                throw new KeyNotFoundException($"No se encontró servicio con el Id: {serviceUpdateDTO.ServiceId}");
+            }
+
+            _context.Entry(existingService).CurrentValues.SetValues(updatedService);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ServiceDTO>(updatedService);
+        }
+
+        public async Task<bool> DeleteService(int id)
+        {
+            var existingService = await _context.Services.FirstOrDefaultAsync(s => s.ServiceId == id);
+
+            if (existingService == null)
+            {
+                throw new KeyNotFoundException($"No se encontró servicio con el Id: {id}");
+            }
+
+            if (existingService.Active == false)
+            {
+                throw new BadRequestException($"El servicio con el id ( {id} ) ya se encuentra deshabilitado");
+            }
+
+            // Hago la baja lógica poniendo Active en false
+            existingService.Active = false;
+            _context.Entry(existingService).Property(x => x.Active).IsModified = true;
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
