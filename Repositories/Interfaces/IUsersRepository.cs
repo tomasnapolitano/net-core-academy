@@ -13,5 +13,6 @@ namespace Repositories.Interfaces
         Task<List<UserDTO>> GetAllAgent();
         Task<List<UserDTO>> GetUsersWithFullName();
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO);
+        Task<UserDTO> DeleteUser(int id);
     }
 }

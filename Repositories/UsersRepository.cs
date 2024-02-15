@@ -227,5 +227,20 @@ namespace Repositories
         {
             return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
         }
+
+        public async Task<UserDTO> DeleteUser(int id)
+        {
+            var existingUser = await _context.Users.FindAsync(id);
+
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
+            }
+
+            existingUser.Active = false;
+            await _context.SaveChangesAsync();
+
+            return await GetUserById(existingUser.UserId);
+        }
     }
 }

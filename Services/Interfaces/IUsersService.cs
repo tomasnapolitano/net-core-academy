@@ -12,5 +12,6 @@ namespace Services.Interfaces
         List<UserDTO> GetUsersWithFullName();
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO);
+        UserDTO DeleteUser(int adminId , int id);
     }
 }
