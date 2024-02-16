@@ -4,6 +4,6 @@
     {
         Admin = 1,
         Agent = 2,
-        Client = 3,
+        Client = 3
     }
 }

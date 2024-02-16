@@ -23,16 +23,6 @@ namespace Services
             return _serviceRepository.GetServiceById(id).Result;
         }
 
-        public ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO)
-        {
-            return _serviceRepository.UpdateService(serviceUpdateDTO).Result;
-        }
-
-        public bool DeleteService(int id)
-        {
-            return _serviceRepository.DeleteService(id).Result;
-        }
-
         public List<ServiceTypeDTO> GetServiceTypes()
         {
             return _serviceRepository.GetServiceTypes().Result;
@@ -46,6 +36,16 @@ namespace Services
         public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
         {
             return _serviceRepository.PostService(serviceCreationDTO).Result;
+        }
+
+        public ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO)
+        {
+            return _serviceRepository.UpdateService(serviceUpdateDTO).Result;
+        }
+
+        public bool DeleteService(int id)
+        {
+            return _serviceRepository.DeleteService(id).Result;
         }
     }
 }

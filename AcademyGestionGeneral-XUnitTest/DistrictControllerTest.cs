@@ -1,13 +1,10 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Options;
 using Models.Entities;
 using Repositories;
 using Repositories.Utils;
 using Services;
-using Sprache;
 using Utils.Middleware;
 
 namespace AcademyGestionGeneral_XUnitTest
@@ -188,7 +185,7 @@ namespace AcademyGestionGeneral_XUnitTest
             //Arrange
             var districtId = 1;
             var errorMessageExpected = "El distrito no posee agente/s a cargo.";
-            var errorCodeExpected = System.Net.HttpStatusCode.NotFound;
+            var errorCodeExpected = System.Net.HttpStatusCode.BadRequest;
 
             //Act
             var exception = Assert.Throws<AggregateException>(() => _districtController.GetDistrictsWithAgent(districtId));

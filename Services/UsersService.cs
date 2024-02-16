@@ -1,5 +1,4 @@
 using Models.DTOs.User;
-using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using Utils.Enum;
@@ -15,6 +14,22 @@ namespace Services
         {
             _usersRepository = usersRepository;
         }
+
+        public List<UserDTO> GetUsers()
+        {
+            return _usersRepository.GetUsers().Result;
+        }
+
+        public List<UserDTO> GetActiveUsers()
+        {
+            return _usersRepository.GetActiveUsers().Result;
+        }
+
+        public List<UserDTO> GetUsersWithFullName()
+        {
+            return _usersRepository.GetUsersWithFullName().Result;
+        }
+
         public List<UserDTO> GetAllAgents()
         {
             return _usersRepository.GetAllAgent().Result;
@@ -33,21 +48,6 @@ namespace Services
         public AgentDTO GetAgentsWithDistrict(int agentId)
         {
             return _usersRepository.GetAgentsWithDistrict(agentId).Result;
-        }
-
-        public List<UserDTO> GetUsers()
-        {
-            return _usersRepository.GetUsers().Result;
-        }
-
-        public List<UserDTO> GetActiveUsers()
-        {
-            return _usersRepository.GetActiveUsers().Result;
-        }
-
-        public List<UserDTO> GetUsersWithFullName()
-        {
-            return _usersRepository.GetUsersWithFullName().Result;
         }
 
         public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
