@@ -32,5 +32,10 @@ namespace Services
         {
             return _districtRepository.AddAgentToDistrict(agentId, districtId).Result;
         }
+
+        public bool RemoveAgentFromDistrict(int districtId)
+        {
+            return _districtRepository.RemoveAgentFromDistrict(districtId).Result;
+        }
     }
 }
