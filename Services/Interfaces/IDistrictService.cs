@@ -7,5 +7,6 @@ namespace Services.Interfaces
         List<DistrictDTO> GetDistricts();
         DistrictDTO GetDistrictById(int id);
         DistrictAgentDTO GetDistrictsWithAgent(int districtId);
+        bool AddAgentToDistrict(int agentId, int districtId);
     }
 }

@@ -27,5 +27,10 @@ namespace Services
         {
             return _districtRepository.GetDistrictsWithAgent(districtId).Result;
         }
+
+        public bool AddAgentToDistrict(int agentId, int districtId)
+        {
+            return _districtRepository.AddAgentToDistrict(agentId, districtId).Result;
+        }
     }
 }
