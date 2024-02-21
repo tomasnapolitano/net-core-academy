@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.District;
 using Models.Entities;
 using Repositories.Interfaces;
+using Utils.Enum;
 using Utils.Middleware;
 
 namespace Repositories
@@ -61,6 +62,44 @@ namespace Repositories
             }
 
             return _mapper.Map<DistrictAgentDTO>(district);
+        }
+
+        public async Task<bool> AddAgentToDistrict(int agentId, int districtId)
+        {
+            var agent = await _context.Users.FirstOrDefaultAsync(x => x.UserId == agentId);
+
+            if (agent == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+
+            if (agent.RoleId != (int)UserRoleEnum.Agent)
+            {
+                throw new BadRequestException("El usuario no posee rol de agente.");
+            }
+
+            var district = await _context.Districts
+                                        .Include(d => d.Agent)
+                                        .FirstOrDefaultAsync(x => x.DistrictId == districtId);
+
+            if (district == null)
+            {
+                throw new KeyNotFoundException("No se encontró el distrito.");
+            }
+
+            // Chequeamos si hay un agente ya asignado (solo se puede 1?)
+            if(district.AgentId != null)
+            {
+                throw new BadRequestException("El distrito ya tiene un Agente asignado.");
+            }
+
+            // Asignamos el agente al distrito
+            district.AgentId = agentId;
+            _context.Entry(district).Property(x => x.AgentId).IsModified = true;
+
+            await _context.SaveChangesAsync();
+
+            return true;
         }
     }
 }
