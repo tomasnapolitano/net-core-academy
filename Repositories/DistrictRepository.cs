@@ -90,11 +90,36 @@ namespace Repositories
             // Chequeamos si hay un agente ya asignado (solo se puede 1?)
             if(district.AgentId != null)
             {
-                throw new BadRequestException("El distrito ya tiene un Agente asignado.");
+                throw new BadRequestException("El distrito ya tiene un agente asignado.");
             }
 
             // Asignamos el agente al distrito
             district.AgentId = agentId;
+            _context.Entry(district).Property(x => x.AgentId).IsModified = true;
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task<bool> RemoveAgentFromDistrict(int districtId)
+        {
+            var district = await _context.Districts
+                                        .Include(d => d.Agent)
+                                        .FirstOrDefaultAsync(x => x.DistrictId == districtId);
+
+            if (district == null)
+            {
+                throw new KeyNotFoundException("No se encontró el distrito.");
+            }
+
+            if (district.AgentId == null)
+            {
+                throw new BadRequestException("El distrito no posee un agente asignado.");
+            }
+
+            // Removemos el agente al distrito
+            district.AgentId = null;
             _context.Entry(district).Property(x => x.AgentId).IsModified = true;
 
             await _context.SaveChangesAsync();
