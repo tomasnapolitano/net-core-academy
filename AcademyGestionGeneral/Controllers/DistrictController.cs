@@ -89,5 +89,21 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _districtService.RemoveAgentFromDistrict(districtId);
         }
+
+        // POST: api/District/{districtId}/services/add/{serviceId}
+        /// <summary>
+        /// Agrega un servicio existente a un distrito en específico
+        /// </summary>
+        /// <param name="districtId">Es el id del distrito</param>
+        /// <param name="serviceId">Es el id del servicio</param>
+        /// <returns>bool</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost("{districtId}/services/add")]
+        public DistrictWithServicesDTO AddServiceToDistrict(int districtId, [FromBody]int serviceId)
+        {
+            return _districtService.AddServiceToDistrict(districtId, serviceId);
+        }
     }
 }

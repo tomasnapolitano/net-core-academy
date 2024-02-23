@@ -25,6 +25,8 @@ namespace Repositories.Utils
             CreateMap<District, DistrictAgentDTO>();
             CreateMap<DistrictAgentDTO, District>();
 
+            CreateMap<District, DistrictWithServicesDTO>();
+
             CreateMap<Service, ServiceDTO>();
             CreateMap<ServiceDTO, Service>(); 
 
