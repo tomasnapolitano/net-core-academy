@@ -1,6 +1,8 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.District;
+using Models.DTOs.Service;
 using Models.Entities;
 using Repositories;
 using Repositories.Utils;
@@ -192,6 +194,98 @@ namespace AcademyGestionGeneral_XUnitTest
             var badRequestException = exception.InnerException is BadRequestException ? exception.InnerException as BadRequestException : null;
 
             //Assert
+            Assert.Equal(errorMessageExpected, badRequestException?.Message);
+        }
+
+        /// <summary>
+        /// Este metodo prueba asignar un agente a un distrito sin agente
+        /// </summary>
+        [Fact]
+        public void GetAddAgentToDistrict_ReturnsOk()
+        {
+            // Arrange
+            var agentId = 2;
+            var districtId = 1;
+
+            // Act
+            var result = _districtController.AddAgentToDistrict(agentId, districtId);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        /// <summary>
+        /// Este metodo prueba asignar un usuario el cual no posee rol de agente
+        /// </summary>
+        [Fact]
+        public void GetAddAgentToDistrict_ReturnsBadRequestNotAgent()
+        {
+            // Arrange
+            var agentId = 3;
+            var districtId = 1;
+            var errorMessageExpected = "El usuario no posee rol de agente.";
+            var errorCodeExpected = System.Net.HttpStatusCode.BadRequest;
+
+            // Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.AddAgentToDistrict(agentId, districtId));
+            var badRequestException = exception.InnerException is BadRequestException ? exception.InnerException as BadRequestException : null;
+
+            // Assert
+            Assert.Equal(errorMessageExpected, badRequestException?.Message);
+        }
+
+        /// <summary>
+        /// Este metodo prueba asignar un agente a un distrito con agente asignado
+        /// </summary>
+        [Fact]
+        public void GetAddAgentToDistrict_ReturnsBadRequestDistrictAgentExist()
+        {
+            // Arrange
+            var agentId = 2;
+            var districtId = 2;
+            var errorMessageExpected = "El distrito ya tiene un agente asignado.";
+            var errorCodeExpected = System.Net.HttpStatusCode.BadRequest;
+
+            // Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.AddAgentToDistrict(agentId, districtId));
+            var badRequestException = exception.InnerException is BadRequestException ? exception.InnerException as BadRequestException : null;
+
+            // Assert
+            Assert.Equal(errorMessageExpected, badRequestException?.Message);
+        }
+
+        /// <summary>
+        /// Este metodo prueba remover un agente de un distrito
+        /// </summary>
+        [Fact]
+        public void GetRemoveAgentFromDistrict_ReturnsOk()
+        {
+            // Arrange
+            var districtId = 2;
+
+            // Act
+            var result = _districtController.RemoveAgentFromDistrict(districtId);
+
+            // Assert
+            Assert.True(result);
+        }
+
+        /// <summary>
+        /// Este metodo prueba remover un agente de un distrito sin agente
+        /// </summary>
+        [Fact]
+        public void GetRemoveAgentFromDistrict_ReturnsBadRequestNotAgentInDistrict()
+        {
+            // Arrange
+            var districtId = 1;
+            var errorMessageExpected = "El distrito no posee un agente asignado.";
+            var errorCodeExpected = System.Net.HttpStatusCode.BadRequest;
+
+            // Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.RemoveAgentFromDistrict(districtId));
+            var badRequestException = exception.InnerException is BadRequestException ? exception.InnerException as BadRequestException : null;
+
+            // Assert
             Assert.Equal(errorMessageExpected, badRequestException?.Message);
         }
     }    
