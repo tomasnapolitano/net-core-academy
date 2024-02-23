@@ -8,10 +8,10 @@ namespace Repositories.Interfaces
         Task<List<DistrictDTO>> GetDistricts();
         Task<DistrictDTO> GetDistrictById(int id);
         Task<DistrictAgentDTO> GetDistrictsWithAgent(int districtId);
+        Task<DistrictWithServicesDTO> GetDistrictWithServices(int districtId);
         Task<bool> AddAgentToDistrict(int agentId, int districtId);
         Task<bool> RemoveAgentFromDistrict(int districtId);
         Task<DistrictWithServicesDTO> AddServiceToDistrict(int districtId, int serviceId);
         Task<DistrictXservice> PostDistrictXservice(int districtId, int serviceId);
-        Task<DistrictWithServicesDTO> GetDistrictWithServicesById(int districtId);
     }
 }
