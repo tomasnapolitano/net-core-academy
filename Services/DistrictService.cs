@@ -38,7 +38,7 @@ namespace Services
             return _districtRepository.RemoveAgentFromDistrict(districtId).Result;
         }
 
-        public bool AddServiceToDistrict(int districtId, int serviceId)
+        public DistrictWithServicesDTO AddServiceToDistrict(int districtId, int serviceId)
         {
             return _districtRepository.AddServiceToDistrict(districtId, serviceId).Result;
         }

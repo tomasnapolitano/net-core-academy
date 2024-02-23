@@ -9,6 +9,6 @@ namespace Services.Interfaces
         DistrictAgentDTO GetDistrictsWithAgent(int districtId);
         bool AddAgentToDistrict(int agentId, int districtId);
         bool RemoveAgentFromDistrict(int districtId);
-        bool AddServiceToDistrict(int districtId, int serviceId);
+        DistrictWithServicesDTO AddServiceToDistrict(int districtId, int serviceId);
     }
 }

@@ -100,8 +100,8 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
-        [HttpPost("{districtId}/services/add/{serviceId}")]
-        public bool AddServiceToDistrict(int districtId, int serviceId)
+        [HttpPost("{districtId}/services/add")]
+        public DistrictWithServicesDTO AddServiceToDistrict(int districtId, [FromBody]int serviceId)
         {
             return _districtService.AddServiceToDistrict(districtId, serviceId);
         }
