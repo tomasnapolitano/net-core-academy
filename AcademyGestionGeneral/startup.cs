@@ -5,6 +5,7 @@ using Models.Entities;
 using Repositories;
 using Repositories.Interfaces;
 using Repositories.Utils;
+using Repositories.Utils.PasswordHasher;
 using Services;
 using Services.Interfaces;
 using Swashbuckle.AspNetCore.SwaggerUI;
@@ -31,6 +32,7 @@ namespace AcademyGestionGeneral
             services.AddTransient<IDistrictRepository, DistrictRepository>();
             services.AddTransient<IServiceService, ServiceService>();
             services.AddTransient<IServiceRepository, ServiceRepository>();
+            services.AddTransient<IPasswordHasher, PasswordHasher>();
 
             services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
