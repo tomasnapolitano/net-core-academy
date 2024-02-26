@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
+using Repositories.Utils.PasswordHasher;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -12,11 +13,13 @@ namespace Repositories
     {
         private readonly ManagementServiceContext _context;
         private readonly IMapper _mapper;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UsersRepository(ManagementServiceContext context, IMapper mapper)
+        public UsersRepository(ManagementServiceContext context, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _context = context;
             _mapper = mapper;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<List<UserDTO>> GetUsers()
@@ -187,7 +190,7 @@ namespace Repositories
                 LastName = userCreationDTO.LastName,
                 Email = userCreationDTO.Email,
                 Dninumber = userCreationDTO.Dninumber,
-                Password = userCreationDTO.Password,
+                Password = _passwordHasher.Hash(userCreationDTO.Password),
                 CreationDate = DateTime.Now,
             };
 
