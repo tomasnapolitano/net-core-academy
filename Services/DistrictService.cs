@@ -23,6 +23,11 @@ namespace Services
             return _districtRepository.GetDistrictById(id).Result;
         }
 
+        public DistrictWithServicesDTO GetDistrictWithServices(int districtId)
+        {
+            return _districtRepository.GetDistrictWithServices(districtId).Result;
+        }
+
         public DistrictAgentDTO GetDistrictsWithAgent(int districtId)
         {
             return _districtRepository.GetDistrictsWithAgent(districtId).Result;

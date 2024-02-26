@@ -149,7 +149,7 @@ namespace Repositories
             if (existingDistrictXservice == null)
             { // La relación no existe:
                 await PostDistrictXservice(districtId, serviceId);
-                return await GetDistrictWithServicesById(districtId);
+                return await GetDistrictWithServices(districtId);
             }
             else if (existingDistrictXservice.Active == false)
             { // La relación existe pero está inactiva:
@@ -159,7 +159,7 @@ namespace Repositories
                     .Property(x => x.Active).IsModified = true;
                 await _context.SaveChangesAsync();
 
-                return await GetDistrictWithServicesById(districtId);
+                return await GetDistrictWithServices(districtId);
             }
             else
             { // La relación existe y ya está activa:
@@ -180,7 +180,7 @@ namespace Repositories
             return districtXservice;
         }
 
-        public async Task<DistrictWithServicesDTO> GetDistrictWithServicesById(int districtId)
+        public async Task<DistrictWithServicesDTO> GetDistrictWithServices(int districtId)
         {
             var districtQuery = await _context.Districts.Include(d => d.DistrictXservices)
                                                         .ThenInclude(dxs => dxs.Service)

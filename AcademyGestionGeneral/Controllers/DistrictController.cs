@@ -44,6 +44,21 @@ namespace AcademyGestionGeneral.Controllers
             return _districtService.GetDistrictById(id);
         }
 
+        // GET: api/District/{districtId}/services
+        /// <summary>
+        /// Obtiene un distrito con sus servicios disponibles
+        /// </summary>
+        /// <param name="districtId">Es el id del distrito</param>
+        /// <returns>DistrictWithServicesDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("{districtId}/services")]
+        public DistrictWithServicesDTO GetDistrictWithServices(int districtId)
+        {
+            return _districtService.GetDistrictWithServices(districtId);
+        }
+
         // GET: api/District/Agents/5
         /// <summary>
         /// Obtiene un distrito con su respectivo agente
