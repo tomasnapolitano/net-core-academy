@@ -1,6 +1,7 @@
 ﻿using Models.DTOs.Service;
 using Repositories.Interfaces;
 using Services.Interfaces;
+using Utils.CustomValidator;
 
 namespace Services
 {
@@ -35,11 +36,13 @@ namespace Services
 
         public ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO)
         {
+            CustomValidatorInput<ServiceCreationDTO>.DTOValidator(serviceCreationDTO);
             return _serviceRepository.PostService(serviceCreationDTO).Result;
         }
 
         public ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO)
         {
+            CustomValidatorInput<ServiceUpdateDTO>.DTOValidator(serviceUpdateDTO);
             return _serviceRepository.UpdateService(serviceUpdateDTO).Result;
         }
 

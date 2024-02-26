@@ -1,6 +1,7 @@
 using Models.DTOs.User;
 using Repositories.Interfaces;
 using Services.Interfaces;
+using Utils.CustomValidator;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -52,6 +53,7 @@ namespace Services
 
         public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
         {
+            CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
             var userRole = _usersRepository.GetRoleById(userId).Result;
 
             // Si es admin crea un AGENTE o CLIENTE o ADMIN
@@ -71,6 +73,7 @@ namespace Services
         }
         public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
         {
+            CustomValidatorInput<UserUpdateDTO>.DTOValidator(userUpdateDTO);
             return _usersRepository.UpdateUser(userUpdateDTO).Result;
         }
 
