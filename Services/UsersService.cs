@@ -51,6 +51,11 @@ namespace Services
             return _usersRepository.GetAgentsWithDistrict(agentId).Result;
         }
 
+        public UserWithServicesDTO SubscribeUserToService(int userId, int serviceId)
+        {
+            return _usersRepository.SubscribeUserToService(userId, serviceId).Result;
+        }
+
         public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);

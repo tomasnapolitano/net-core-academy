@@ -1,10 +1,12 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
+using System.Linq.Expressions;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -100,7 +102,6 @@ namespace Repositories
             }
 
             return _mapper.Map<UserDTO>(user);
-
         }
 
         public async Task<List<UserDTO>> GetUsersByDistrictId(int districtId)
@@ -146,6 +147,107 @@ namespace Repositories
             }
 
             return _mapper.Map<AgentDTO>(user);
+        }
+
+        public async Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId)
+        {
+            var user = await _context.Users.Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+            if (user.Address.Location == null)
+            {
+                throw new KeyNotFoundException("El usuario no tiene una locación asignada.");
+            }
+            if (user.Address.Location.District == null)
+            {
+                throw new KeyNotFoundException("El usuario no tiene distrito asignado.");
+            }
+
+            var service = await _context.Services.FindAsync(serviceId);
+
+            if (service == null)
+            {
+                throw new KeyNotFoundException("No se encontró el servicio.");
+            }
+
+            int? districtId = user.Address.Location.DistrictId;
+            var districtXservice = await _context.DistrictXservices.FirstOrDefaultAsync(
+                                                        dxs => dxs.DistrictId == districtId
+                                                        && dxs.ServiceId == serviceId);
+
+            if (districtXservice == null || districtXservice.Active == false)
+            {
+                throw new KeyNotFoundException("Este servicio no se encuentra disponible para este usuario.");
+            }
+
+            var existingSubscription = await _context.ServiceSubscriptions.FirstOrDefaultAsync(
+                                                        s => s.UserId == userId
+                                                        && s.DistrictXserviceId == districtXservice.DistrictXserviceId);
+
+            if (existingSubscription != null)
+            { // Ya está suscrito:
+                return await GetUserWithServices(userId);
+            }
+
+            // No está suscrito. Creando la suscripción:
+            ServiceSubscription subscription = new ServiceSubscription()
+            {
+                UserId = userId,
+                DistrictXserviceId = districtXservice.DistrictXserviceId,
+                StartDate = DateTime.Now,
+                PauseSubscription = false,
+            };
+
+            await _context.AddAsync(subscription);
+            await _context.SaveChangesAsync();
+
+            return await GetUserWithServices(userId);
+        }
+
+        public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                throw new KeyNotFoundException("No se encontró el usuario.");
+
+            var userWithServicesDTO = _mapper.Map<UserWithServicesDTO>(user);
+            var subscriptionQueryResult = await _context.ServiceSubscriptions
+                                                        .Include(s => s.DistrictXservice)
+                                                        .ThenInclude(dxs => dxs.Service)
+                                                        .Where(x => x.UserId == userId 
+                                                            && x.DistrictXservice.Active == true 
+                                                            && x.DistrictXservice.Service.Active == true)
+                                                        .ToListAsync();
+            foreach (var subscription in subscriptionQueryResult)
+            {
+                ServiceDTO serviceDTO = new ServiceDTO()
+                {
+                    ServiceId = subscription.DistrictXservice.Service.ServiceId,
+                    ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
+                    ServiceName = subscription.DistrictXservice.Service.ServiceName,
+                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                };
+
+                ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
+                {
+                    SubscriptionId = subscription.SubscriptionId,
+                    UserId = subscription.UserId,
+                    DistrictXserviceId = subscription.DistrictXservice.DistrictXserviceId,
+                    StartDate = subscription.StartDate,
+                    PauseSubscription = subscription.PauseSubscription,
+                    Service = serviceDTO
+                };
+                userWithServicesDTO.ServiceSubscriptions.Add(serviceSubscriptionDTO);
+            }
+
+            return userWithServicesDTO;
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)

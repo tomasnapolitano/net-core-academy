@@ -119,6 +119,19 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetAgentsWithDistrict(agentId);
         }
 
+        // PUT: api/Users/1
+        /// <summary>
+        ///  Suscribe un usuario a un servicio específico.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="serviceId"></param>
+        /// <returns>UserWithServicesDTO</returns>
+        [HttpPost("{userId}/services/subscribe")]
+        public UserWithServicesDTO SubscribeUserToService(int userId, [FromBody]int serviceId)
+        {
+            return _usersService.SubscribeUserToService(userId, serviceId);
+        }
+
         /// <summary>
         ///  Crear un nuevo usuario (Agente o Cliente), dependiendo el usuario recibido por argumento.
         /// </summary>

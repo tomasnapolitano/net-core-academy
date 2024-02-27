@@ -5,6 +5,7 @@ using Models.DTOs.User;
 using Models.Entities;
 using Repositories;
 using Repositories.Utils;
+using Repositories.Utils.PasswordHasher;
 using Services;
 using Utils.Middleware;
 
@@ -27,7 +28,8 @@ namespace AcademyGestionGeneral_XUnitTest
             var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
             var mapper = mapConfig.CreateMapper();
 
-            var usersRepository = new UsersRepository(_managementContextFake, mapper);
+            var passwordHasher = new PasswordHasher();
+            var usersRepository = new UsersRepository(_managementContextFake, mapper, passwordHasher);
             var usersService = new UsersService(usersRepository);
             _usersController = new UsersController(usersService);
         }
