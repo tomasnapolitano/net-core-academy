@@ -1,9 +1,11 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.District;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class DistrictController : ControllerBase
