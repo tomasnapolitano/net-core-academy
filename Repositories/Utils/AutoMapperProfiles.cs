@@ -13,6 +13,8 @@ namespace Repositories.Utils
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>();
 
+            CreateMap<User, UserWithServicesDTO>().ForMember(u => u.ServiceSubscriptions, opt => opt.Ignore());
+
             CreateMap<AgentDTO, User>();
             CreateMap<User, AgentDTO>();
 
