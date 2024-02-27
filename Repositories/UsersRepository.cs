@@ -99,7 +99,6 @@ namespace Repositories
             }
 
             return _mapper.Map<UserDTO>(user);
-
         }
 
         public async Task<List<UserDTO>> GetUsersByDistrictId(int districtId)
@@ -145,6 +144,75 @@ namespace Repositories
             }
 
             return _mapper.Map<AgentDTO>(user);
+        }
+
+        public async Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId)
+        {
+            var user = await _context.Users.Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+            if (user.Address.Location == null)
+            {
+                throw new KeyNotFoundException("El usuario no tiene una locación asignada.");
+            }
+            if (user.Address.Location.District == null)
+            {
+                throw new KeyNotFoundException("El usuario no tiene distrito asignado.");
+            }
+
+            var service = await _context.Services.FindAsync(serviceId);
+
+            if (service == null)
+            {
+                throw new KeyNotFoundException("No se encontró el servicio.");
+            }
+
+            int? districtId = user.Address.Location.DistrictId;
+            var districtXservice = await _context.DistrictXservices.FirstOrDefaultAsync(
+                                                        dxs => dxs.DistrictId == districtId 
+                                                        && dxs.ServiceId == serviceId);
+
+            if (districtXservice == null || districtXservice.Active == false)
+            {
+                throw new KeyNotFoundException("Este servicio no se encuentra disponible para este usuario.");
+            }
+
+            // Creando la suscripción:
+            ServiceSubscription subscription = new ServiceSubscription()
+            {
+                UserId = userId,
+                DistrictXserviceId = districtXservice.DistrictXserviceId,
+                StartDate = DateTime.Now,
+                PauseSubscription = false,
+            };
+
+            await _context.AddAsync(subscription);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+
+            if (user == null)
+                throw new KeyNotFoundException("No se encontró el usuario.");
+
+            var userDTO = _mapper.Map<UserDTO>(user);
+            var subscriptionQueryResult = await _context.ServiceSubscriptions
+                                                        .Include(s => s.DistrictXservice)
+                                                        .ThenInclude(dxs => dxs.Service)
+                                                        .Select(x => x.UserId == userId 
+                                                            && x.DistrictXservice.Active == true 
+                                                            && x.DistrictXservice.Service.Active == true)
+                                                        .ToListAsync();
+
+
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
