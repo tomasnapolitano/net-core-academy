@@ -113,7 +113,7 @@ namespace AcademyGestionGeneral.Controllers
         /// </summary>
         /// <param name="districtId">Es el id del distrito</param>
         /// <param name="serviceId">Es el id del servicio</param>
-        /// <returns>bool</returns>
+        /// <returns>DistrictWithServiceDTO</returns>
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
@@ -121,6 +121,22 @@ namespace AcademyGestionGeneral.Controllers
         public DistrictWithServicesDTO AddServiceToDistrict(int districtId, [FromBody]int serviceId)
         {
             return _districtService.AddServiceToDistrict(districtId, serviceId);
+        }
+
+        // PUT: api/District/{districtId}/services/deactivate/{serviceId}
+        /// <summary>
+        /// Desactiva un servicio existente de un distrito en específico
+        /// </summary>
+        /// <param name="districtId">Es el id del distrito</param>
+        /// <param name="serviceId">Es el id del servicio</param>
+        /// <returns>DistrictWithServicesDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("{districtId}/services/deactivate")]
+        public DistrictWithServicesDTO DeactivateServiceByDistrict(int districtId, [FromBody]int serviceId)
+        {
+            return _districtService.DeactivateServiceByDistrict(districtId, serviceId);
         }
     }
 }

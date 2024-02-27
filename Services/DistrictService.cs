@@ -47,5 +47,10 @@ namespace Services
         {
             return _districtRepository.AddServiceToDistrict(districtId, serviceId).Result;
         }
+
+        public DistrictWithServicesDTO DeactivateServiceByDistrict(int districtId, int serviceId)
+        {
+            return _districtRepository.DeactivateServiceByDistrict(districtId, serviceId).Result;
+        }
     }
 }
