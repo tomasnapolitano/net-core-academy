@@ -12,6 +12,7 @@ namespace Repositories.Interfaces
         Task<UserDTO> GetUserById(int id);
         Task<List<UserDTO>> GetUsersByDistrictId(int districtId);
         Task<AgentDTO> GetAgentsWithDistrict(int agentId);
+        Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId);
         Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO);
         Task<UserDTO> DeleteUser(int id);

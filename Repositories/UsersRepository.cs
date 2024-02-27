@@ -1,9 +1,11 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
+using System.Linq.Expressions;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -175,7 +177,7 @@ namespace Repositories
 
             int? districtId = user.Address.Location.DistrictId;
             var districtXservice = await _context.DistrictXservices.FirstOrDefaultAsync(
-                                                        dxs => dxs.DistrictId == districtId 
+                                                        dxs => dxs.DistrictId == districtId
                                                         && dxs.ServiceId == serviceId);
 
             if (districtXservice == null || districtXservice.Active == false)
@@ -183,7 +185,16 @@ namespace Repositories
                 throw new KeyNotFoundException("Este servicio no se encuentra disponible para este usuario.");
             }
 
-            // Creando la suscripción:
+            var existingSubscription = await _context.ServiceSubscriptions.FirstOrDefaultAsync(
+                                                        s => s.UserId == userId
+                                                        && s.DistrictXserviceId == districtXservice.DistrictXserviceId);
+
+            if (existingSubscription != null)
+            { // Ya está suscrito:
+                return await GetUserWithServices(userId);
+            }
+
+            // No está suscrito. Creando la suscripción:
             ServiceSubscription subscription = new ServiceSubscription()
             {
                 UserId = userId,
@@ -194,6 +205,8 @@ namespace Repositories
 
             await _context.AddAsync(subscription);
             await _context.SaveChangesAsync();
+
+            return await GetUserWithServices(userId);
         }
 
         public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
@@ -203,16 +216,37 @@ namespace Repositories
             if (user == null)
                 throw new KeyNotFoundException("No se encontró el usuario.");
 
-            var userDTO = _mapper.Map<UserDTO>(user);
+            var userWithServicesDTO = _mapper.Map<UserWithServicesDTO>(user);
             var subscriptionQueryResult = await _context.ServiceSubscriptions
                                                         .Include(s => s.DistrictXservice)
                                                         .ThenInclude(dxs => dxs.Service)
-                                                        .Select(x => x.UserId == userId 
+                                                        .Where(x => x.UserId == userId 
                                                             && x.DistrictXservice.Active == true 
                                                             && x.DistrictXservice.Service.Active == true)
                                                         .ToListAsync();
+            foreach (var subscription in subscriptionQueryResult)
+            {
+                ServiceDTO serviceDTO = new ServiceDTO()
+                {
+                    ServiceId = subscription.DistrictXservice.Service.ServiceId,
+                    ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
+                    ServiceName = subscription.DistrictXservice.Service.ServiceName,
+                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                };
 
+                ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
+                {
+                    SubscriptionId = subscription.SubscriptionId,
+                    UserId = subscription.UserId,
+                    DistrictXserviceId = subscription.DistrictXservice.DistrictXserviceId,
+                    StartDate = subscription.StartDate,
+                    PauseSubscription = subscription.PauseSubscription,
+                    Service = serviceDTO
+                };
+                userWithServicesDTO.ServiceSubscriptions.Add(serviceSubscriptionDTO);
+            }
 
+            return userWithServicesDTO;
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
