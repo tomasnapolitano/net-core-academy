@@ -119,6 +119,21 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetAgentsWithDistrict(agentId);
         }
 
+        // GET: api/Users/{userId}/services
+        /// <summary>
+        /// Obtiene un usuario con sus servicios suscritos
+        /// </summary>
+        /// <param name="userId">Es el id del usuario</param>
+        /// <returns>UserWithServicesDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("Agents/{agentId}")]
+        public UserWithServicesDTO GetUserWithServices(int userId)
+        {
+            return _usersService.GetUserWithServices(userId);
+        }
+
         // PUT: api/Users/1
         /// <summary>
         ///  Suscribe un usuario a un servicio específico.
