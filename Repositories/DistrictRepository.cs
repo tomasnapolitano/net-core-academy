@@ -215,5 +215,32 @@ namespace Repositories
            
             return districtWithServicesDTO;
         }
+
+        public async Task<DistrictWithServicesDTO> DeactivateServiceByDistrict(int districtId, int serviceId)
+        {
+            var existingDistrictXservice = await _context.DistrictXservices
+                                                        .FirstOrDefaultAsync(dXs =>
+                                                            dXs.DistrictId == districtId
+                                                            && dXs.ServiceId == serviceId);
+
+            if (existingDistrictXservice == null)
+            { // La relación no existe:
+                throw new KeyNotFoundException("El distrito especificado no posee este servicio.");
+            }
+            else if (existingDistrictXservice.Active == false)
+            { // La relación existe y está inactiva:
+                throw new BadRequestException("El distrito y servicio especificados ya se encuentran desactivados.");
+            }
+            else
+            { // La relación existe y está activa:
+                existingDistrictXservice.Active = false;
+
+                _context.Entry(existingDistrictXservice)
+                    .Property(x => x.Active).IsModified = true;
+                await _context.SaveChangesAsync();
+
+                return await GetDistrictWithServices(districtId);
+            }
+        }
     }
 }

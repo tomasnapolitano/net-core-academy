@@ -13,5 +13,6 @@ namespace Repositories.Interfaces
         Task<bool> RemoveAgentFromDistrict(int districtId);
         Task<DistrictWithServicesDTO> AddServiceToDistrict(int districtId, int serviceId);
         Task<DistrictXservice> PostDistrictXservice(int districtId, int serviceId);
+        Task<DistrictWithServicesDTO> DeactivateServiceByDistrict(int districtId, int serviceId);
     }
 }
