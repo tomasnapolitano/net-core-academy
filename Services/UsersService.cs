@@ -1,4 +1,5 @@
 using Models.DTOs.User;
+using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using Utils.CustomValidator;
@@ -54,6 +55,11 @@ namespace Services
         public UserWithServicesDTO SubscribeUserToService(int userId, int serviceId)
         {
             return _usersRepository.SubscribeUserToService(userId, serviceId).Result;
+        }
+
+        public UserWithServicesDTO GetUserWithServices(int userId)
+        {
+            return _usersRepository.GetUserWithServices(userId).Result;
         }
 
         public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
