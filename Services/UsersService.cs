@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.IdentityModel.Tokens;
 using Models.DTOs.Login;
 using Models.DTOs.User;
@@ -25,8 +24,7 @@ namespace Services
 
         public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
         {
-
-            var userWithToken = _usersRepository.Login(userLoginDTO).Result;
+            UserWithTokenDTO userWithToken = _usersRepository.Login(userLoginDTO).Result;
             var Token = GetToken(userWithToken);
             userWithToken.Token = Token;
             return userWithToken;

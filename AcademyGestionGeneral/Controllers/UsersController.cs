@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Login;
 using Models.DTOs.User;
 using Services.Interfaces;
-using System.Security.Claims;
 
 namespace AcademyGestionGeneral.Controllers
 {

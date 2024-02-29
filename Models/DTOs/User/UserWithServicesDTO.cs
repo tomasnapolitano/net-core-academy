@@ -1,5 +1,4 @@
-﻿using Models.DTOs.District;
-using Models.DTOs.Service;
+﻿using Models.DTOs.Service;
 
 namespace Models.DTOs.User
 {
