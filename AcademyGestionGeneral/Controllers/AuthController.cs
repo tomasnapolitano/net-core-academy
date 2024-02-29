@@ -21,12 +21,14 @@ namespace AcademyGestionGeneral.Controllers
         [HttpPost("token")]
         public IActionResult GetToken()
         {
+            var userName = HttpContext.User.Identity.Name;
+
             var jwt = new Jwt
             {
-                Key = _configuration["Jwt:Key"],
-                Issuer = _configuration["Jwt:Issuer"],
-                Audience = _configuration["Jwt:Audience"],
-                Subject = _configuration["Jwt:Subject"]
+                Key = Environment.GetEnvironmentVariable("JWT_KEY"),
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                Subject = Environment.GetEnvironmentVariable("JWT_SUBJECT")
             };
 
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -34,7 +36,7 @@ namespace AcademyGestionGeneral.Controllers
             {
                 Subject = new ClaimsIdentity(new Claim[]
                 {
-                    new Claim(ClaimTypes.Name, "UsuarioEjemplo") 
+                    new Claim(ClaimTypes.Name, userName)
                 }),
                 Expires = DateTime.UtcNow.AddMinutes(30), // token expira en 30 minutos
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)), SecurityAlgorithms.HmacSha256Signature),
