@@ -1,8 +1,13 @@
+using Microsoft.AspNetCore.Http;
+using Microsoft.IdentityModel.Tokens;
 using Models.DTOs.Login;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using Services.Interfaces;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Utils.CustomValidator;
 using Utils.Enum;
 using Utils.Middleware;
@@ -20,7 +25,11 @@ namespace Services
 
         public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
         {
-            return _usersRepository.Login(userLoginDTO).Result;
+
+            var userWithToken = _usersRepository.Login(userLoginDTO).Result;
+            var Token = GetToken(userWithToken);
+            userWithToken.Token = Token;
+            return userWithToken;
         }
 
         public List<UserDTO> GetUsers()
@@ -88,6 +97,7 @@ namespace Services
                 throw new BadRequestException("El id usuario enviado por parametro no puede crear usuarios. No es ADMIN/AGENTE");
             }
         }
+
         public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
         {
             CustomValidatorInput<UserUpdateDTO>.DTOValidator(userUpdateDTO);
@@ -106,6 +116,35 @@ namespace Services
             {
                 throw new BadRequestException("El id usuario enviado por parametro no puede eliminar usuarios. No es ADMIN");
             }
+        }
+
+        public string GetToken(UserWithTokenDTO userWithTokenDTO)
+        {
+            var jwt = new Jwt
+            {
+                Key = Environment.GetEnvironmentVariable("JWT_KEY"),
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                Subject = Environment.GetEnvironmentVariable("JWT_SUBJECT")
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, userWithTokenDTO.UserId.ToString()),
+                    new Claim(ClaimTypes.Role, userWithTokenDTO.RoleId.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(30), // token expira en 30 minutos
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = jwt.Issuer,
+                Audience = jwt.Audience
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
     }
 }
