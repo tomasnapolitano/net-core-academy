@@ -1,6 +1,4 @@
-﻿using Models.DTOs.District;
-
-namespace Models.DTOs.User
+﻿namespace Models.DTOs.User
 {
     public class UserDTO
     {

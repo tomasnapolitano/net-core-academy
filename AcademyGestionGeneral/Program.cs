@@ -2,10 +2,6 @@ using AcademyGestionGeneral;
 using NLog;
 using NLog.Web;
 
-//var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
-//var logger = LogManager.GetCurrentClassLogger();
-//logger.Debug("init main");
-
 var logger = NLog.LogManager.Setup()
     .LoadConfigurationFromFile()
     .GetCurrentClassLogger();

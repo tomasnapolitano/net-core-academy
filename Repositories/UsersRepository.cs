@@ -1,13 +1,11 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
-using Models.DTOs.Login;
 using Models.Entities;
 using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
-using System.Linq.Expressions;
 using Utils.Enum;
 using Utils.Middleware;
 
