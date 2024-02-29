@@ -1,3 +1,4 @@
+using Models.DTOs.Login;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
@@ -15,6 +16,11 @@ namespace Services
         public UsersService(IUsersRepository usersRepository)
         {
             _usersRepository = usersRepository;
+        }
+
+        public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
+        {
+            return _usersRepository.Login(userLoginDTO).Result;
         }
 
         public List<UserDTO> GetUsers()

@@ -1,9 +1,11 @@
+using Models.DTOs.Login;
 using Models.DTOs.User;
 
 namespace Repositories.Interfaces
 {
     public interface IUsersRepository
     {
+        Task<UserWithTokenDTO> Login(UserLoginDTO userLoginDTO);
         Task<List<UserDTO>> GetUsers();
         Task<List<UserDTO>> GetActiveUsers();
         Task<List<UserDTO>> GetAllAgent();

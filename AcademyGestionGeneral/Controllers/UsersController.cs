@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs.Login;
 using Models.DTOs.User;
 using Services.Interfaces;
 using System.Security.Claims;
@@ -16,6 +17,21 @@ namespace AcademyGestionGeneral.Controllers
         public UsersController(IUsersService usersService)
         {
             _usersService = usersService;
+        }
+
+        // POST: api/Users/login
+        /// <summary>
+        /// Login a la plataforma
+        /// </summary>
+        /// <returns>Bool</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
+        {
+            return _usersService.Login(userLoginDTO);
         }
 
         // GET: api/Users
