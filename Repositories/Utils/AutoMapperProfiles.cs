@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Models.DTOs.District;
+using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
@@ -12,6 +13,8 @@ namespace Repositories.Utils
         {
             CreateMap<User, UserDTO>();
             CreateMap<UserDTO, User>();
+
+            CreateMap<User, UserWithTokenDTO>();
 
             CreateMap<User, UserWithServicesDTO>().ForMember(u => u.ServiceSubscriptions, opt => opt.Ignore());
 

@@ -1,9 +1,11 @@
-﻿using Models.DTOs.User;
+﻿using Models.DTOs.Login;
+using Models.DTOs.User;
 
 namespace Services.Interfaces
 {
     public interface IUsersService
-    { 
+    {
+        UserWithTokenDTO Login(UserLoginDTO userLoginDTO);
         List<UserDTO> GetUsers();
         List<UserDTO> GetActiveUsers();
         List<UserDTO> GetAllAgents();

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.Service;
 using Models.DTOs.User;
+using Models.DTOs.Login;
 using Models.Entities;
 using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
@@ -23,6 +24,23 @@ namespace Repositories
             _context = context;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+        }
+
+        public async Task<UserWithTokenDTO> Login(UserLoginDTO userLoginDTO)
+        {
+            var searchedUser = _context.Users.Where(u => 
+                                                 u.Email == userLoginDTO.Email)
+                                             .FirstOrDefault();
+
+            if (searchedUser == null)
+                throw new KeyNotFoundException("El email ingresado no tiene una cuenta asociada. Por favor comuníquese con su Agente asignado para dar de alta su cuenta.");
+            
+            if (!_passwordHasher.Verify(searchedUser.Password, userLoginDTO.Password))
+                throw new BadRequestException("La contraseña ingresada no es correcta.");
+
+            // crear una custom exception para error de login?
+
+            return _mapper.Map<UserWithTokenDTO>(searchedUser);
         }
 
         public async Task<List<UserDTO>> GetUsers()
