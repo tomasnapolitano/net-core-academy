@@ -26,9 +26,9 @@ namespace Repositories
 
         public async Task<UserWithTokenDTO> Login(UserLoginDTO userLoginDTO)
         {
-            var searchedUser = _context.Users.Where(u => 
+            var searchedUser = await _context.Users.Where(u => 
                                                  u.Email == userLoginDTO.Email)
-                                             .FirstOrDefault();
+                                             .FirstOrDefaultAsync();
 
             if (searchedUser == null)
                 throw new KeyNotFoundException("El email ingresado no tiene una cuenta asociada. Por favor comuníquese con su Agente asignado para dar de alta su cuenta.");
