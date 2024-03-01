@@ -1,6 +1,7 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Login;
 using Models.DTOs.User;
 using Models.Entities;
 using Repositories;
@@ -28,6 +29,11 @@ namespace AcademyGestionGeneral_XUnitTest
             var mapConfig = new MapperConfiguration(cfg => cfg.AddProfile(new AutoMapperProfiles()));
             var mapper = mapConfig.CreateMapper();
 
+            Environment.SetEnvironmentVariable("JWT_KEY", "jwtTestKeyyyyyyyyyyyyy====lksdmslkdmflksmdlksmd");
+            Environment.SetEnvironmentVariable("JWT_ISSUER", "https://localhost:7105/");
+            Environment.SetEnvironmentVariable("JWT_AUDIENCE", "https://localhost:7105/");
+            Environment.SetEnvironmentVariable("JWT_SUBJECT", "baseWebApiSubject");
+
             var passwordHasher = new PasswordHasher();
             var usersRepository = new UsersRepository(_managementContextFake, mapper, passwordHasher);
             var usersService = new UsersService(usersRepository);
@@ -38,7 +44,8 @@ namespace AcademyGestionGeneral_XUnitTest
         {
             var users = new List<User>
             {
-                new User() { UserId = 1 , FirstName = "Fernando" , LastName = "Alarcon" , Email = "alarcon@test.com" , Password = "TEST19239" , Dninumber = "15151515" , CreationDate = DateTime.Now , AddressId = 1 , RoleId = 1 },
+                // Password para UserId=1 es "Password0":
+                new User() { UserId = 1 , FirstName = "Fernando" , LastName = "Alarcon" , Email = "alarcon@test.com" , Password = "1usY83lgTX/5VK98K5Kodw==;UEsD0yHxWXFH5ZbcZuBMGoUVPzo3Wpgil7xWx+kOqmU=" , Dninumber = "15151515" , CreationDate = DateTime.Now , AddressId = 1 , RoleId = 1 },
                 new User() { UserId = 2 , FirstName = "Ema" , LastName = "Roffo" , Email = "roffo@test.com" , Password = "TEST19239" , Dninumber = "19181717" , CreationDate = DateTime.Now , AddressId = 2 , RoleId = 2 },
                 new User() { UserId = 3 , FirstName = "Silvio" , LastName = "Romero" , Email = "romero@test.com" , Password = "TEST19239" , Dninumber = "42599687" , CreationDate = DateTime.Now , AddressId = 3 , RoleId = 3 }
             };
@@ -73,6 +80,71 @@ namespace AcademyGestionGeneral_XUnitTest
             _managementContextFake.Locations.AddRange(location);
             _managementContextFake.Districts.AddRange(district);
             _managementContextFake.SaveChanges();
+        }
+
+        /// <summary>
+        /// Este metodo prueba login de Usuarios
+        /// </summary>
+        [Fact]
+        public void Login_ReturnOk()
+        {
+            //Arrange
+            UserLoginDTO userLoginDTO = new()
+            {
+                Email = "alarcon@test.com",
+                Password = "Password0"
+            };
+
+            //Act
+            var result = _usersController.Login(userLoginDTO);
+
+            //Assert
+            Assert.NotNull(result);
+            Assert.IsAssignableFrom<UserWithTokenDTO>(result);
+        }
+
+        /// <summary>
+        /// Este metodo prueba login de Usuarios, ingresando email no existente.
+        /// </summary>
+        [Fact]
+        public void Login_ReturnErrorNonExistingEmail()
+        {
+            //Arrange
+            UserLoginDTO userLoginDTO = new()
+            {
+                Email = "fernando_uvedoble@test.com",
+                Password = "Password0"
+            };
+
+            var errorMessageExpected = "El email ingresado no tiene una cuenta asociada. Por favor comuníquese con su Agente asignado para dar de alta su cuenta.";
+
+            //Act & Assert
+            var keyNotFoundException = Assert.Throws<AggregateException>(() => _usersController.Login(userLoginDTO));
+            var innerExc = keyNotFoundException.InnerException;
+            //Assert
+            Assert.Equal(errorMessageExpected, innerExc.Message);
+        }
+
+        /// <summary>
+        /// Este metodo prueba login de Usuarios, ingresando una contraseña incorrecta.
+        /// </summary>
+        [Fact]
+        public void Login_ReturnErrorIncorrectPassword()
+        {
+            //Arrange
+            UserLoginDTO userLoginDTO = new()
+            {
+                Email = "alarcon@test.com",
+                Password = "Contraseñita"
+            };
+
+            var errorMessageExpected = "La contraseña ingresada no es correcta.";
+
+            //Act & Assert
+            var keyNotFoundException = Assert.Throws<AggregateException>(() => _usersController.Login(userLoginDTO));
+            var innerExc = keyNotFoundException.InnerException;
+            //Assert
+            Assert.Equal(errorMessageExpected, innerExc.Message);
         }
 
         /// <summary>
