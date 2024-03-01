@@ -114,14 +114,14 @@ namespace AcademyGestionGeneral_XUnitTest
             //Arrange
             var userId = 1;
             var newUser = new UserCreationDTO() 
-            { 
-                FirstName = "Test", 
-                LastName = "Test", 
-                Dninumber = "Test", 
-                Neighborhood = "Test", 
-                Password = "Test", 
-                PostalCode = "B1704", 
-                DistrictId = 1, 
+            {
+                FirstName = "Test",
+                LastName = "Test",
+                Dninumber = "42595687",
+                Neighborhood = "Test",
+                Password = "Test1234",
+                PostalCode = "B1704",
+                DistrictId = 1,
                 Email = "test@test.com",
                 RoleId = 3,
                 StreetNumber = "Test",
@@ -148,9 +148,9 @@ namespace AcademyGestionGeneral_XUnitTest
             {
                 FirstName = "Test",
                 LastName = "Test",
-                Dninumber = "Test",
+                Dninumber = "42599687",
                 Neighborhood = "Test",
-                Password = "Test",
+                Password = "Test1234",
                 PostalCode = "B1704",
                 DistrictId = 1,
                 Email = "test@test.com",
@@ -183,7 +183,7 @@ namespace AcademyGestionGeneral_XUnitTest
                 LastName = "Test",
                 Dninumber = "42599687",
                 Neighborhood = "Test",
-                Password = "Test",
+                Password = "Test1234",
                 PostalCode = "B1704",
                 DistrictId = 1,
                 Email = "test@test.com",
@@ -216,7 +216,7 @@ namespace AcademyGestionGeneral_XUnitTest
                 LastName = "Test",
                 Dninumber = "78978997",
                 Neighborhood = "Test",
-                Password = "Test",
+                Password = "Test1234",
                 PostalCode = "AAA89",
                 DistrictId = 1,
                 Email = "test@test.com",
