@@ -49,11 +49,14 @@ namespace AcademyGestionGeneral
             services.AddDbContext<ManagementServiceContext>(options =>
 
                options.UseSqlServer(Environment.GetEnvironmentVariable("dbConnectionString"))
-            ); 
-            
+            );
+
             DotNetEnv.Env.Load();
 
-            // JWT
+            var jwtIssuer = Environment.GetEnvironmentVariable("Jwt_Issuer");
+            var jwtAudience = Environment.GetEnvironmentVariable("Jwt_Audience");
+            var jwtKey = Environment.GetEnvironmentVariable("Jwt_Key");
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
             {
                 options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -62,9 +65,9 @@ namespace AcademyGestionGeneral
                     ValidateAudience = true,
                     ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Audience"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+                    ValidIssuer = jwtIssuer,
+                    ValidAudience = jwtAudience,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
                 };
             });
 
