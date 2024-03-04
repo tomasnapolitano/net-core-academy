@@ -190,34 +190,26 @@ namespace Repositories
 
             DistrictWithServicesDTO districtWithServicesDTO = new DistrictWithServicesDTO()
             {
-                DistrictId = districtId,
-                DistrictName = district.DistrictName,
                 Services = new List<ServiceDTO>()
             };
 
-            var districtQuery = await _context.Districts.Include(d => d.DistrictXservices)
-                                                        .ThenInclude(dxs => dxs.Service)
-                                                        .Where(x => 
-                                                            x.DistrictId==districtId
-                                                            && x.DistrictXservices.Any(dxs => dxs.Active == true))
-                                                        .ToListAsync();
+            var districtQuery = await _context.Districts
+                                                .Where(d => d.DistrictId == districtId)
+                                                .Select(d => new {
+                                                    District = d,
+                                                    ActiveServices = d.DistrictXservices
+                                                        .Where(dxs => dxs.Active)
+                                                        .Select(dxs => dxs.Service)
+                                                        .ToList()
+                                                })
+                                                .FirstOrDefaultAsync();
 
+            districtWithServicesDTO.DistrictId = districtQuery.District.DistrictId;
+            districtWithServicesDTO.DistrictName = districtQuery.District.DistrictName;
 
-            if (!districtQuery.Any())
+            foreach (var element in districtQuery.ActiveServices)
             {
-                return districtWithServicesDTO;
-            }
-
-            var queryResult = districtQuery[0];
-
-            foreach (var element in queryResult.DistrictXservices)
-            {
-                //ServiceDTO service = new()
-                //{
-                //    ServiceId = element.ServiceId,
-                //    ServiceName = element.Service.
-                //};
-                var service = _mapper.Map<ServiceDTO>(element.Service);
+                var service = _mapper.Map<ServiceDTO>(element);
                 districtWithServicesDTO.Services.Add(service);
             }
            
