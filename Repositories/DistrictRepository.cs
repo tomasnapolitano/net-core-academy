@@ -181,6 +181,20 @@ namespace Repositories
 
         public async Task<DistrictWithServicesDTO> GetDistrictWithServices(int districtId)
         {
+            var district = await _context.Districts
+                                         .FirstOrDefaultAsync(d => d.DistrictId == districtId);
+            if (district == null)
+            {
+                throw new KeyNotFoundException("No se encontró el distrito.");
+            }
+
+            DistrictWithServicesDTO districtWithServicesDTO = new DistrictWithServicesDTO()
+            {
+                DistrictId = districtId,
+                DistrictName = district.DistrictName,
+                Services = new List<ServiceDTO>()
+            };
+
             var districtQuery = await _context.Districts.Include(d => d.DistrictXservices)
                                                         .ThenInclude(dxs => dxs.Service)
                                                         .Where(x => 
@@ -188,18 +202,13 @@ namespace Repositories
                                                             && x.DistrictXservices.Any(dxs => dxs.Active == true))
                                                         .ToListAsync();
 
+
             if (!districtQuery.Any())
             {
-                throw new KeyNotFoundException("No se encontró el distrito.");
+                return districtWithServicesDTO;
             }
 
             var queryResult = districtQuery[0];
-            DistrictWithServicesDTO districtWithServicesDTO = new DistrictWithServicesDTO()
-            {
-                DistrictId = districtId,
-                DistrictName = queryResult.DistrictName,
-                Services = new List<ServiceDTO>()
-            };
 
             foreach (var element in queryResult.DistrictXservices)
             {
