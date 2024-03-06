@@ -149,7 +149,7 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetUserWithServices(userId);
         }
 
-        // PUT: api/Users/1
+        // POST: api/Users/1/services/subscribe
         /// <summary>
         ///  Suscribe un usuario a un servicio específico.
         /// </summary>
@@ -160,6 +160,18 @@ namespace AcademyGestionGeneral.Controllers
         public UserWithServicesDTO SubscribeUserToService(int userId, [FromBody]int serviceId)
         {
             return _usersService.SubscribeUserToService(userId, serviceId);
+        }
+
+        // PUT: api/Users/services/1/pausesubscribe
+        /// <summary>
+        /// Pausa la suscripción de un usuario a un servicio específico.
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns>UserWithServicesDTO</returns>
+        [HttpPut("services/{subscriptionId}/pausesubscribe")]
+        public UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId)
+        {
+            return _usersService.PauseSubscribeUserToService(subscriptionId);
         }
 
         /// <summary>
