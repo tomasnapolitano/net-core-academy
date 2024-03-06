@@ -14,6 +14,7 @@ namespace Services.Interfaces
         AgentDTO GetAgentsWithDistrict(int agentId);
         List<UserDTO> GetUsersByDistrictId(int districtId);
         UserWithServicesDTO SubscribeUserToService(int userId, int serviceId);
+        UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId);
         UserWithServicesDTO GetUserWithServices(int userId);
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO);

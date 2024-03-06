@@ -226,6 +226,36 @@ namespace Repositories
             return await GetUserWithServices(userId);
         }
 
+        public async Task<UserWithServicesDTO> PauseSubscribeUserToService(int subscriptionId)
+        {
+            var subscription = await _context.ServiceSubscriptions.FirstOrDefaultAsync(idS => idS.SubscriptionId == subscriptionId);
+
+            if (subscription == null)
+            {
+                throw new KeyNotFoundException("No se encontró ninguna suscripción con el ID indicado.");
+            }
+
+            if(subscription.UserId == null)
+            {
+                throw new KeyNotFoundException("La suscripción no está relacionada a ningun usuario.");
+            }
+
+            if (subscription.PauseSubscription == true)
+            {
+                throw new BadRequestException("La suscripción del ID ingresado ya está pausada.");
+            }
+
+            // Chequeamos si es agente? si es su suscripción?
+
+            subscription.PauseSubscription = true;
+
+            _context.Entry(subscription)
+                .Property(x => x.PauseSubscription).IsModified = true;
+            await _context.SaveChangesAsync();
+
+            return await GetUserWithServices((int)subscription.UserId);
+        }
+
         public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
         {
             var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);

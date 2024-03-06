@@ -70,6 +70,11 @@ namespace Services
             return _usersRepository.SubscribeUserToService(userId, serviceId).Result;
         }
 
+        public UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId)
+        {
+            return _usersRepository.PauseSubscribeUserToService(subscriptionId).Result;
+        }
+
         public UserWithServicesDTO GetUserWithServices(int userId)
         {
             return _usersRepository.GetUserWithServices(userId).Result;
