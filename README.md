@@ -1,29 +1,11 @@
-# README #
-
-This README would normally document whatever steps are necessary to get your application up and running.
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+# Academy .NET Training Backend
+## Código
+Incorporar el codigo en la carpeta `src/`para que el pipeline pueda buildear y desplegar.
+## Build
+```bash
+$ dotnet restore
+$ dotnet dotnet publish --no-restore --no-self-contained --configuration Release --output ../publish
+```
+## Deploys
+Los commits a la rama **develop** se construyen y despliegan automáticamente al entorno **DEV**.
+Para pasar al entorno **UAT/QAT** se debe realizar un **PullRequest** desde la rama **develop** hacia la rama **master**.
