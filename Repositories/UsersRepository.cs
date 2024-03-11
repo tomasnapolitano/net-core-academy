@@ -77,25 +77,6 @@ namespace Repositories
             return _mapper.Map<List<UserDTO>>(listAgent);
         }
 
-        public async Task<List<UserDTO>> GetUsersWithFullName()
-        {
-            var users = await _context.Users.Select(x => new UserDTO()
-            {
-                UserId = x.UserId,
-                RoleId = x.RoleId,
-                AddressId = x.AddressId,
-                FirstName = x.FirstName,
-                LastName = x.LastName,
-                Email = x.Email,
-                DniNumber = x.Dninumber,
-                CreationDate = x.CreationDate,
-                FullName = x.FirstName + ' ' + x.LastName
-            })
-                                            .ToListAsync();
-
-            return users;
-        }
-
         public async Task<int> GetRoleById(int id)
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);

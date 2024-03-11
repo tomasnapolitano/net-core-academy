@@ -9,7 +9,6 @@ namespace Services.Interfaces
         List<UserDTO> GetUsers();
         List<UserDTO> GetActiveUsers();
         List<UserDTO> GetAllAgents();
-        List<UserDTO> GetUsersWithFullName();
         UserDTO GetUserById(int id);
         AgentDTO GetAgentsWithDistrict(int agentId);
         List<UserDTO> GetUsersByDistrictId(int districtId);
