@@ -1,0 +1,96 @@
+image: mcr.microsoft.com/devcontainers/dotnet:6.0
+definitions:
+  cache:
+    key: "${CI_JOB_NAME}"
+    paths:
+      - .sonar/cache
+  code-build: &code-build
+      script:
+        - dotnet restore
+        - dotnet publish --no-restore --no-self-contained --configuration Release --output ../publish
+      artifacts:
+        - publish/**
+  application-publish: &application-publish
+      services:
+        - docker
+      script:
+        ## creo y guardo el tag y el image name para usar en kubectl despues
+        - echo "export IMAGE_NAME=mobydigital/$BITBUCKET_PROJECT_SLUG" >> docker-version.txt
+        - echo "export IMAGE_TAG=$BITBUCKET_BUILD_NUMBER" >> docker-version.txt
+        - cat docker-version.txt
+        - source docker-version.txt
+        ## buildeo y publico la docker image en rl registry
+        - docker build -t $IMAGE_NAME:$IMAGE_TAG .
+        - docker login --username $DOCKER_HUB_USERNAME --password $DOCKER_HUB_PASSWORD
+        - docker push $IMAGE_NAME:$IMAGE_TAG
+      artifacts:
+        - docker-version.txt
+  code-review: &code-review
+        clone:
+          depth: full
+        script:
+          - dotnet tool install --global dotnet-sonarscanner
+          - dotnet tool install --global dotnet-coverage
+          - export PATH="$PATH:/root/.dotnet/tools"
+          - mkdir -p /etc/apt/keyrings
+          - curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
+          - echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
+          - apt-get update
+          - apt install -y openjdk-17-jre-headless nodejs
+          - dotnet sonarscanner begin /d:sonar.token=${SONARQUBE_TOKEN} /d:sonar.host.url=${SONAR_HOST_URL} /v:"${BITBUCKET_BUILD_NUMBER}" $EXTRA_ARGS
+          - dotnet build --no-incremental
+          - dotnet-coverage collect 'dotnet test' -f xml  -o 'coverage.xml'
+          - dotnet sonarscanner end /d:sonar.token=${SONARQUBE_TOKEN}
+          - pipe: sonarsource/sonarqube-quality-gate:1.1.0
+            variables:
+              SONAR_TOKEN: ${SONARQUBE_TOKEN}
+              REPORT_FILE: '.sonarqube/out/.sonar/report-task.txt'
+  deployk8s: &deployk8s
+        image: mobydigital/backup-image
+        clone: 
+          enabled: false
+        script:
+          - source docker-version.txt
+          - export NAMESPACE=academy-dotnet-${echo -n $BITBUCKET_DEPLOYMENT_ENVIRONMENT | sed -e "s/testing/dev/g; s/staging/uat/g"; s/production/prod/g";)
+          - curl -sL https://github.com/digitalocean/doctl/releases/download/v1.96.1/doctl-1.96.1-linux-amd64.tar.gz | tar -xzv
+          - ./doctl -t $DOCTL_TOKEN k8s cluster kubeconfig show talento-k8s > kubeconfig.yml
+          - kubectl --insecure-skip-tls-verify --kubeconfig=kubeconfig.yml set image deployment/$BITBUCKET_ backend=$IMAGE_NAME:$IMAGE_TAG -n $NAMESPACE --record=true
+pipelines:
+  branches:
+    ## Pipeline for NO-PRD DEPLOY
+    develop:
+      - step:
+          name: "Code Review SONARQUBE"
+          <<: *code-review
+      
+      - step:
+          name: "TODO TESTING"
+          script:
+            - echo "Testeo unitario y funcional"
+      
+      - step:
+          name: "Code Building"
+          <<: *code-build
+      - step:
+          name: "Application Publish"
+          <<: *application-publish
+      - step:
+          name: "Application DEV deployment"
+          deployment: testing
+          <<: *deployk8s
+          
+      - step:
+          name: "TODO DATS TESTING"
+          script:
+            - echo "This script runs only on commit to branches with names that match the feature/* pattern."
+          
+    ## Pipeline for PRD DEPLOY
+    master:
+      - step:
+          name: "Application QAT/UAT deployment"
+          deployment: staging
+          <<: *deployk8s
+      - step:
+          name: "TODO DATS TESTING"
+          script:
+            - echo "This script runs only on commit to branches with names that match the feature/* pattern."
