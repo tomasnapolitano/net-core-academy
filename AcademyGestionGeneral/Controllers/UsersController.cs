@@ -169,7 +169,8 @@ namespace AcademyGestionGeneral.Controllers
         [HttpPost]
         public UserDTO PostUser(int userId , UserCreationDTO userCreationDTO)
         {
-            return _usersService.PostUser(userId , userCreationDTO);
+            string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _usersService.PostUser(userId , userCreationDTO, token);
         }
 
         // PUT: api/Users/1
@@ -183,7 +184,8 @@ namespace AcademyGestionGeneral.Controllers
         [HttpPut("{id}")]
         public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
         {
-            return _usersService.UpdateUser(userUpdateDTO);
+            string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _usersService.UpdateUser(userUpdateDTO, token);
         }
 
         // DELETE: api/Users/1
@@ -195,9 +197,10 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpDelete("{id}")]
-        public UserDTO DeleteUser(int userAdminId , int id)
+        public UserDTO DeleteUser(int id)
         {
-            return _usersService.DeleteUser(userAdminId , id);
+            string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _usersService.DeleteUser(id, token);
         }
     }
 }

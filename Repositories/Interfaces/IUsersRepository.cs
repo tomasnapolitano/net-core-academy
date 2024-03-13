@@ -16,8 +16,8 @@ namespace Repositories.Interfaces
         Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId);
         Task<UserWithServicesDTO> PauseSubscribeUserToService(int subscriptionId);
         Task<UserWithServicesDTO> GetUserWithServices(int userId);
-        Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole);
-        Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO);
-        Task<UserDTO> DeleteUser(int id);
+        Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
+        Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
+        Task<UserDTO> DeleteUser(int id, string token);
     }
 }
