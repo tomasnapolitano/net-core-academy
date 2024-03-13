@@ -15,8 +15,8 @@ namespace Services.Interfaces
         UserWithServicesDTO SubscribeUserToService(int userId, int serviceId);
         UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId);
         UserWithServicesDTO GetUserWithServices(int userId);
-        UserDTO PostUser(int userId , UserCreationDTO userCreationDTO);
-        UserDTO UpdateUser(UserUpdateDTO userUpdateDTO);
-        UserDTO DeleteUser(int adminId , int id);
+        UserDTO PostUser(int userId , UserCreationDTO userCreationDTO, string token);
+        UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
+        UserDTO DeleteUser(int id, string token);
     }
 }

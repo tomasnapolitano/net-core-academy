@@ -6,6 +6,9 @@ using Models.DTOs.User;
 using Models.Entities;
 using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
+using System.Data;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -277,8 +280,17 @@ namespace Repositories
             return userWithServicesDTO;
         }
 
-        public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole)
+        public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
         {
+            var rol = GetRolesFromToken(token);
+            var clientRoleValue = Convert.ToInt32(UserRoleEnum.Client).ToString();
+            var agentRoleValue = Convert.ToInt32(UserRoleEnum.Agent).ToString();
+
+            if (rol.Contains(clientRoleValue) || (rol.Contains(agentRoleValue) && userCreationDTO.RoleId == (int)UserRoleEnum.Admin))
+            {
+                throw new UnauthorizedAccessException("El usuario no tiene permisos para acceder a este recurso.");
+            }
+
             if (ExistsDniUser(userCreationDTO.Dninumber).Result)
             {
                 throw new KeyNotFoundException($"El DNI ingresado ya existe, no puede crear un usuario con DNI: {userCreationDTO.Dninumber}");
@@ -342,8 +354,16 @@ namespace Repositories
             return userDTO;
         }
 
-        public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO)
+        public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token)
         {
+            var rol = GetRolesFromToken(token);
+            var clientRoleValue = Convert.ToInt32(UserRoleEnum.Client).ToString();
+
+            if (rol.Contains(clientRoleValue))
+            {
+                throw new UnauthorizedAccessException("El usuario no tiene permisos para acceder a este recurso.");
+            }
+
             var existingUser = await _context.Users.FindAsync(userUpdateDTO.UserId);
 
             if (existingUser == null)
@@ -360,8 +380,16 @@ namespace Repositories
             return await GetUserById(existingUser.UserId);
         }
 
-        public async Task<UserDTO> DeleteUser(int id)
+        public async Task<UserDTO> DeleteUser(int id, string token)
         {
+            var rol = GetRolesFromToken(token);
+            var adminRoleValue = Convert.ToInt32(UserRoleEnum.Admin).ToString();
+
+            if (!rol.Contains(adminRoleValue))
+            {
+                throw new UnauthorizedAccessException("El usuario no tiene permisos para acceder a este recurso.");
+            }
+
             var existingUser = await _context.Users.FindAsync(id);
 
             if (existingUser == null)
@@ -386,6 +414,23 @@ namespace Repositories
         private async Task<bool> ExistsUserRole(int role)
         {
             return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
+        }
+        private string[] GetRolesFromToken(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadToken(token) as JwtSecurityToken;
+
+            if (jsonToken == null)
+            {
+                throw new InvalidOperationException("El token JWT no pudo ser leído correctamente.");
+            }
+
+            var roles = jsonToken?.Claims
+                                .Where(claim => claim.Type == "role")
+                                .Select(claim => claim.Value)
+                                .ToArray();
+
+            return roles ?? new string[0];
         }
     }
 }

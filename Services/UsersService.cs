@@ -75,45 +75,22 @@ namespace Services
             return _usersRepository.GetUserWithServices(userId).Result;
         }
 
-        public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO)
+        public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO, string token)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
-            var userRole = _usersRepository.GetRoleById(userId).Result;
 
-            // Si es admin crea un AGENTE o CLIENTE o ADMIN
-            if (userRole == (int)UserRoleEnum.Admin)
-            {
-                return _usersRepository.PostUser(userCreationDTO, userCreationDTO.RoleId).Result;
-            }
-            // Si es agente se fuerza a que cree solamente un CLIENTE
-            else if (userRole == (int)UserRoleEnum.Agent)
-            {
-                return _usersRepository.PostUser(userCreationDTO, (int)UserRoleEnum.Client).Result;
-            }
-            else
-            {
-                throw new BadRequestException("El id usuario enviado por parametro no puede crear usuarios. No es ADMIN/AGENTE");
-            }
+            return _usersRepository.PostUser(userCreationDTO, userCreationDTO.RoleId, token).Result;
         }
 
-        public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO)
+        public UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token)
         {
             CustomValidatorInput<UserUpdateDTO>.DTOValidator(userUpdateDTO);
-            return _usersRepository.UpdateUser(userUpdateDTO).Result;
+            return _usersRepository.UpdateUser(userUpdateDTO, token).Result;
         }
 
-        public UserDTO DeleteUser( int adminId , int id)
+        public UserDTO DeleteUser(int id, string token)
         {
-            var userRole = _usersRepository.GetRoleById(adminId).Result;
-
-            if (userRole == (int)UserRoleEnum.Admin)
-            {
-                return _usersRepository.DeleteUser(id).Result;
-            }
-            else
-            {
-                throw new BadRequestException("El id usuario enviado por parametro no puede eliminar usuarios. No es ADMIN");
-            }
+            return _usersRepository.DeleteUser(id, token).Result;
         }
 
         public string GetToken(UserWithTokenDTO userWithTokenDTO)
