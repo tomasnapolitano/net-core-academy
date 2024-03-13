@@ -75,20 +75,6 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetAllAgents();
         }
 
-        // GET: api/Users/UsersFullName
-        /// <summary>
-        /// Obtiene todos los usuarios con su nombre completo
-        /// </summary>
-        /// <returns>Lista de UserDTO</returns>
-        /// <response code="200">La operación fue exitosa</response>
-        /// <response code="500">Internal server error</response>
-        /// <response code="400">Mal ingreso de datos</response>
-        [HttpGet("UsersFullName")]
-        public List<UserDTO> GetUsersWithFullName()
-        {
-            return _usersService.GetUsersWithFullName();
-        }
-
         // GET: api/Users/5
         /// <summary>
         /// Obtiene un usuario

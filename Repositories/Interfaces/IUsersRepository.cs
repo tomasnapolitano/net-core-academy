@@ -9,7 +9,6 @@ namespace Repositories.Interfaces
         Task<List<UserDTO>> GetUsers();
         Task<List<UserDTO>> GetActiveUsers();
         Task<List<UserDTO>> GetAllAgent();
-        Task<List<UserDTO>> GetUsersWithFullName();
         Task<int> GetRoleById(int id);
         Task<UserDTO> GetUserById(int id);
         Task<List<UserDTO>> GetUsersByDistrictId(int districtId);
