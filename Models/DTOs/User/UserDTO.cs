@@ -1,4 +1,5 @@
-﻿using System.Xml.Linq;
+﻿using Models.DTOs.District;
+using System.Xml.Linq;
 
 namespace Models.DTOs.User
 {
@@ -13,6 +14,7 @@ namespace Models.DTOs.User
         public string DniNumber { get; set; } = null!;
         public DateTime CreationDate { get; set; }
         public string Active { get; set; } = null!;
+        public DistrictDTO District { get; set; } = new DistrictDTO() { DistrictId = 0, DistrictName = "Sin Distrito"};
 
         public string FullName
         {
