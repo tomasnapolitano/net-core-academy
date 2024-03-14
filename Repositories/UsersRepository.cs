@@ -46,14 +46,27 @@ namespace Repositories
 
         public async Task<List<UserDTO>> GetUsers()
         {
-            var users = await _context.Users.ToListAsync();
+            var users = await _context.Users.Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .ToListAsync();
 
             if (users.Count == 0)
             {
                 throw new KeyNotFoundException("La lista de usuarios está vacía.");
             }
 
-            return _mapper.Map<List<UserDTO>>(users);
+            List<UserDTO> usersDTO = new List<UserDTO>();
+
+            foreach(var user in users)
+            {
+                UserDTO userDTO = _mapper.Map<UserDTO>(user);
+                userDTO.District.DistrictId = user.Address.Location.DistrictId;
+                userDTO.District.DistrictName = user.Address.Location.District.DistrictName;
+                usersDTO.Add(userDTO);
+            }
+
+            return usersDTO;
         }
 
         public async Task<List<UserDTO>> GetActiveUsers()
