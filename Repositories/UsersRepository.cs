@@ -188,6 +188,10 @@ namespace Repositories
             {
                 throw new KeyNotFoundException("No se encontró el servicio.");
             }
+            if (service.Active == false)
+            {
+                throw new KeyNotFoundException("Este servicio se encuentra deshabilitado.");
+            }
 
             int? districtId = user.Address.Location.DistrictId;
             var districtXservice = await _context.DistrictXservices.FirstOrDefaultAsync(
