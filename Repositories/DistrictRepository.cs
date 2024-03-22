@@ -140,6 +140,10 @@ namespace Repositories
             {
                 throw new KeyNotFoundException("No se encontró el servicio.");
             }
+            if (service.Active == false)
+            {
+                throw new KeyNotFoundException("Este servicio se encuentra deshabilitado.");
+            }
 
             var existingDistrictXservice = await _context.DistrictXservices
                                                         .FirstOrDefaultAsync(dXs =>
@@ -207,10 +211,13 @@ namespace Repositories
             districtWithServicesDTO.DistrictId = districtQuery.District.DistrictId;
             districtWithServicesDTO.DistrictName = districtQuery.District.DistrictName;
 
-            foreach (var element in districtQuery.ActiveServices)
+            foreach (var service in districtQuery.ActiveServices)
             {
-                var service = _mapper.Map<ServiceDTO>(element);
-                districtWithServicesDTO.Services.Add(service);
+                if (service!=null && service.Active)
+                {
+                    var serviceDTO = _mapper.Map<ServiceDTO>(service);
+                    districtWithServicesDTO.Services.Add(serviceDTO);
+                }
             }
            
             return districtWithServicesDTO;
