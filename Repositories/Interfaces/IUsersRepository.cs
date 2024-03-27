@@ -1,4 +1,5 @@
 using Models.DTOs.Login;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 
 namespace Repositories.Interfaces
@@ -16,6 +17,7 @@ namespace Repositories.Interfaces
         Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId);
         Task<UserWithServicesDTO> PauseSubscribeUserToService(int subscriptionId);
         Task<UserWithServicesDTO> GetUserWithServices(int userId);
+        Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId);
         Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         Task<UserDTO> DeleteUser(int id, string token);
