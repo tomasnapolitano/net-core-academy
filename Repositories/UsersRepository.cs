@@ -56,22 +56,16 @@ namespace Repositories
                 throw new KeyNotFoundException("La lista de usuarios está vacía.");
             }
 
-            List<UserDTO> usersDTO = new List<UserDTO>();
-
-            foreach(var user in users)
-            {
-                UserDTO userDTO = _mapper.Map<UserDTO>(user);
-                userDTO.District.DistrictId = user.Address.Location.DistrictId;
-                userDTO.District.DistrictName = user.Address.Location.District.DistrictName;
-                usersDTO.Add(userDTO);
-            }
-
-            return usersDTO;
+            return _mapper.Map<List<UserDTO>>(users);
         }
 
         public async Task<List<UserDTO>> GetActiveUsers()
         {
-            var users = await _context.Users.Where(x => x.Active == true).ToListAsync();
+            var users = await _context.Users.Where(x => x.Active == true)
+                                            .Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .ToListAsync();
 
             if (users.Count == 0)
             {
@@ -83,7 +77,11 @@ namespace Repositories
 
         public async Task<List<UserDTO>> GetAllAgent()
         {
-            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
+            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent)
+                                            .Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .ToListAsync();
 
             if (listAgent.Count == 0)
             {
@@ -108,8 +106,8 @@ namespace Repositories
         public async Task<UserDTO> GetUserById(int id)
         {
             var user = await _context.Users.Include(u => u.Address)
-                                            .ThenInclude(a => a.Location)
-                                            .ThenInclude(l => l.District)
+                                           .ThenInclude(a => a.Location)
+                                           .ThenInclude(l => l.District)
                                             .FirstOrDefaultAsync(x => x.UserId == id);
 
             if (user == null)
@@ -117,11 +115,7 @@ namespace Repositories
                 throw new KeyNotFoundException("No se encontró el usuario.");
             }
 
-            UserDTO userDTO = _mapper.Map<UserDTO>(user);
-            userDTO.District.DistrictId = user.Address.Location.DistrictId;
-            userDTO.District.DistrictName = user.Address.Location.District.DistrictName;
-
-            return userDTO;
+            return _mapper.Map<UserDTO>(user);
         }
 
         public async Task<List<UserDTO>> GetUsersByDistrictId(int districtId)
@@ -266,7 +260,10 @@ namespace Repositories
 
         public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users.Include(u => u.Address)
+                                           .ThenInclude(a => a.Location)
+                                           .ThenInclude(l => l.District)
+                                           .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
                 throw new KeyNotFoundException("No se encontró el usuario.");
@@ -279,7 +276,6 @@ namespace Repositories
                                                             && x.DistrictXservice.Active == true
                                                             && x.DistrictXservice.Service.Active == true)
                                                         .ToListAsync();
-            var userDTO = _mapper.Map<UserDTO>(user);
 
             foreach (var subscription in subscriptionQueryResult)
             {
@@ -384,18 +380,7 @@ namespace Repositories
             await _context.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            var userDTO = new UserDTO()
-            {
-                UserId = user.UserId,
-                RoleId = user.RoleId,
-                AddressId = user.AddressId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                DniNumber = user.Dninumber,
-                CreationDate = user.CreationDate,
-
-            };
+            UserDTO userDTO = await GetUserById(user.UserId);
             return userDTO;
         }
 
