@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.DTOs.Login;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 using Services.Interfaces;
 
@@ -146,6 +147,18 @@ namespace AcademyGestionGeneral.Controllers
         public UserWithServicesDTO SubscribeUserToService(int userId, [FromBody]int serviceId)
         {
             return _usersService.SubscribeUserToService(userId, serviceId);
+        }
+
+        // GET: api/Users/1/services/1/consumption
+        /// <summary>
+        ///  Obtiene la consumisión de un usuario sobre un servicio al que está suscrito.
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns>ConsumptionDTO</returns> 
+        [HttpGet("api/Users/subscription/{subscriptionId}")]
+        public ConsumptionDTO GetSubscriptionConsumption(int subscriptionId)
+        {
+            return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
         }
 
         // PUT: api/Users/services/1/pausesubscribe
