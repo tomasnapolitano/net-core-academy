@@ -1,4 +1,5 @@
 ﻿using Models.DTOs.Login;
+using Models.DTOs.Service;
 using Models.DTOs.User;
 
 namespace Services.Interfaces
@@ -15,6 +16,7 @@ namespace Services.Interfaces
         UserWithServicesDTO SubscribeUserToService(int userId, int serviceId);
         UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId);
         UserWithServicesDTO GetUserWithServices(int userId);
+        ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId);
         UserDTO PostUser(int userId , UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);

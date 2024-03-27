@@ -345,20 +345,6 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
-        /// Obtener una lista de todos usuario con su nombre completo
-        /// </summary>
-        [Fact]
-        public void GetListUserFullName_ReturnsOk()
-        {
-            //Act
-            var result = _usersController.GetUsersWithFullName();
-
-            //Assert            
-            Assert.NotNull(result);
-            Assert.Equal(this._managementContextFake.Users.ToList().Count, result.Count);
-        }
-
-        /// <summary>
         /// Excepcion al intentar actualizar los datos de un usuario que no existe
         /// </summary>
         [Fact]

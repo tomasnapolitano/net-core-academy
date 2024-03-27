@@ -56,22 +56,16 @@ namespace Repositories
                 throw new KeyNotFoundException("La lista de usuarios está vacía.");
             }
 
-            List<UserDTO> usersDTO = new List<UserDTO>();
-
-            foreach(var user in users)
-            {
-                UserDTO userDTO = _mapper.Map<UserDTO>(user);
-                userDTO.District.DistrictId = user.Address.Location.DistrictId;
-                userDTO.District.DistrictName = user.Address.Location.District.DistrictName;
-                usersDTO.Add(userDTO);
-            }
-
-            return usersDTO;
+            return _mapper.Map<List<UserDTO>>(users);
         }
 
         public async Task<List<UserDTO>> GetActiveUsers()
         {
-            var users = await _context.Users.Where(x => x.Active == true).ToListAsync();
+            var users = await _context.Users.Where(x => x.Active == true)
+                                            .Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .ToListAsync();
 
             if (users.Count == 0)
             {
@@ -83,7 +77,11 @@ namespace Repositories
 
         public async Task<List<UserDTO>> GetAllAgent()
         {
-            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent).ToListAsync();
+            var listAgent = await _context.Users.Where(x=> x.RoleId == (int)UserRoleEnum.Agent)
+                                            .Include(u => u.Address)
+                                            .ThenInclude(a => a.Location)
+                                            .ThenInclude(l => l.District)
+                                            .ToListAsync();
 
             if (listAgent.Count == 0)
             {
@@ -107,7 +105,10 @@ namespace Repositories
 
         public async Task<UserDTO> GetUserById(int id)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.UserId == id);
+            var user = await _context.Users.Include(u => u.Address)
+                                           .ThenInclude(a => a.Location)
+                                           .ThenInclude(l => l.District)
+                                            .FirstOrDefaultAsync(x => x.UserId == id);
 
             if (user == null)
             {
@@ -259,7 +260,10 @@ namespace Repositories
 
         public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId);
+            var user = await _context.Users.Include(u => u.Address)
+                                           .ThenInclude(a => a.Location)
+                                           .ThenInclude(l => l.District)
+                                           .FirstOrDefaultAsync(u => u.UserId == userId);
 
             if (user == null)
                 throw new KeyNotFoundException("No se encontró el usuario.");
@@ -268,10 +272,11 @@ namespace Repositories
             var subscriptionQueryResult = await _context.ServiceSubscriptions
                                                         .Include(s => s.DistrictXservice)
                                                         .ThenInclude(dxs => dxs.Service)
-                                                        .Where(x => x.UserId == userId 
-                                                            && x.DistrictXservice.Active == true 
+                                                        .Where(x => x.UserId == userId
+                                                            && x.DistrictXservice.Active == true
                                                             && x.DistrictXservice.Service.Active == true)
                                                         .ToListAsync();
+
             foreach (var subscription in subscriptionQueryResult)
             {
                 ServiceDTO serviceDTO = new ServiceDTO()
@@ -285,8 +290,8 @@ namespace Repositories
                 ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
                 {
                     SubscriptionId = subscription.SubscriptionId,
-                    UserId = subscription.UserId,
-                    DistrictXserviceId = subscription.DistrictXservice.DistrictXserviceId,
+                    UserId = userId,
+                    DistrictXservice = _mapper.Map<DistrictXserviceDTO>(subscription.DistrictXservice),
                     StartDate = subscription.StartDate,
                     PauseSubscription = subscription.PauseSubscription,
                     Service = serviceDTO
@@ -295,6 +300,25 @@ namespace Repositories
             }
 
             return userWithServicesDTO;
+        }
+
+        public async Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId)
+        {
+            var subscriptionQuery = await _context.ServiceSubscriptions
+                                                    .Include(sub => sub.User)
+                                                    .Include(sub => sub.DistrictXservice)
+                                                    .ThenInclude(dxs => dxs.Service)
+                                                    .Where(x => x.SubscriptionId == subscriptionId)
+                                                    .FirstOrDefaultAsync();
+
+            if (subscriptionQuery == null)
+                throw new KeyNotFoundException("No se encontró la suscripción.");
+
+            ServiceSubscriptionWithUserDTO subscription = _mapper.Map<ServiceSubscriptionWithUserDTO>(subscriptionQuery);
+            subscription.Service = _mapper.Map<ServiceDTO>(subscriptionQuery.DistrictXservice.Service);
+            subscription.User = await GetUserById(subscription.User.UserId);
+
+            return _mapper.Map<ServiceSubscriptionWithUserDTO>(subscription);
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
@@ -356,18 +380,7 @@ namespace Repositories
             await _context.AddAsync(user);
             await _context.SaveChangesAsync();
 
-            var userDTO = new UserDTO()
-            {
-                UserId = user.UserId,
-                RoleId = user.RoleId,
-                AddressId = user.AddressId,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Email = user.Email,
-                DniNumber = user.Dninumber,
-                CreationDate = user.CreationDate,
-
-            };
+            UserDTO userDTO = await GetUserById(user.UserId);
             return userDTO;
         }
 
