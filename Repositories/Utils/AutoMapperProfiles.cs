@@ -27,6 +27,9 @@ namespace Repositories.Utils
             CreateMap<ServiceSubscription,ServiceSubscriptionWithUserDTO>();
             CreateMap<ServiceSubscription,ServiceSubscriptionDTO>();
 
+            CreateMap<Address,AddressDTO>();
+            CreateMap<Location,LocationDTO>();
+
             CreateMap<District, DistrictDTO>();
             CreateMap<DistrictDTO, District>();
 
