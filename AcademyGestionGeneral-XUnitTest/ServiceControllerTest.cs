@@ -35,9 +35,9 @@ namespace AcademyGestionGeneral_XUnitTest
         {
             var services = new List<Service>
             {
-                new Service() { ServiceId = 1 , ServiceName = "Servicio 1" , PricePerUnit = 5400 , ServiceTypeId = 1},
-                new Service() { ServiceId = 2 , ServiceName = "Servicio 2" , PricePerUnit = 100 , ServiceTypeId = 2},
-                new Service() { ServiceId = 3 , ServiceName = "Servicio 3" , PricePerUnit = 10000, ServiceTypeId = 3},
+                new Service() { ServiceId = 1 , ServiceName = "Servicio 1" , PricePerUnit = 5400 , ServiceTypeId = 1, Active = true},
+                new Service() { ServiceId = 2 , ServiceName = "Servicio 2" , PricePerUnit = 100 , ServiceTypeId = 2, Active = true},
+                new Service() { ServiceId = 3 , ServiceName = "Servicio 3" , PricePerUnit = 10000, ServiceTypeId = 3, Active = true},
             };
 
             var serviceTypes = new List<ServiceType>
@@ -57,7 +57,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el get de listado de Servicios
         /// </summary>
         [Fact]
-        public void ServiceController_GetServices_ReturnOK()
+        public void GetServices_ReturnOK()
         {
             //Act
             var result = _serviceController.GetServices();
@@ -70,7 +70,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este método prueba el get de listado vacio de Servicios
         /// </summary>
         [Fact]
-        public void ServiceController_GetServices_EmptyResult()
+        public void GetServices_EmptyResult()
         {
             _managementContextFake.Services.RemoveRange(_managementContextFake.Services);
             _managementContextFake.SaveChanges();
@@ -90,7 +90,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// </summary> 
         [Theory]
         [InlineData(1)]
-        public void ServiceController_GetServiceById_ReturnOK(int id)
+        public void GetServiceById_ReturnOK(int id)
         {
             //Act
             var result = _serviceController.GetServiceById(id);
@@ -103,7 +103,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este método prueba el get de Servicios por id inexistente
         /// </summary>
         [Fact]
-        public void ServiceController_GetServiceById_NotFound()
+        public void GetServiceById_ErrorNotFound()
         {
             _managementContextFake.Services.RemoveRange(_managementContextFake.Services);
             _managementContextFake.SaveChanges();
@@ -123,7 +123,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el get de listado de tipos de servicio
         /// </summary> 
         [Fact]
-        public void ServiceController_GetServiceTypes_ReturnOK()
+        public void GetServiceTypes_ReturnOK()
         {
             //Act
             var result = _serviceController.GetServiceTypes();
@@ -137,7 +137,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// </summary>
         /// Se crea un nuevo context ya que la relación entre tablas Service y ServiceType lo requiere
         [Fact]
-        public void ServiceController_GetServiceTypes_EmptyResult()
+        public void GetServiceTypes_EmptyResult()
         {
             var options2 = new DbContextOptionsBuilder<ManagementServiceContext>()
            .UseInMemoryDatabase(databaseName: $"InventoryDBMemory-{Guid.NewGuid()}")
@@ -167,7 +167,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// </summary> 
         [Theory]
         [InlineData(1)]
-        public void ServiceController_GetServiceTypeById_ReturnOK(int id)
+        public void GetServiceTypeById_ReturnOK(int id)
         {
             //Act
             var result = _serviceController.GetServiceTypeById(id);
@@ -181,7 +181,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este método prueba el get de Tipo de Servicio por id inexistente
         /// </summary>
         [Fact]
-        public void ServiceController_GetServiceTypeById_NotFound()
+        public void GetServiceTypeById_ErrorNotFound()
         {
             int idToSearch = 99999;
             var errorMessageExpected = $"No se encontró tipo de servicio con el Id: {idToSearch}";
@@ -199,7 +199,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el post de un servicio
         /// </summary> 
         [Fact]
-        public void ServiceController_PostService_ReturnOK()
+        public void PostService_ReturnOK()
         {
             // Arrange
             var newService = new ServiceCreationDTO()
@@ -222,7 +222,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el post de un servicio con un tipo de servicio inexistente
         /// </summary> 
         [Fact]
-        public void ServiceController_PostService_ServiceTypeNotFound()
+        public void PostService_ErrorServiceTypeNotFound()
         {
             // Arrange
             var newService = new ServiceCreationDTO()
@@ -246,7 +246,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el update de un servicio
         /// </summary> 
         [Fact]
-        public void ServiceController_UpdateService_ReturnOK()
+        public void UpdateService_ReturnOK()
         {
             // Arrange
             var updatedService = new ServiceUpdateDTO()
@@ -273,7 +273,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba el update de un servicio inexistente
         /// </summary> 
         [Fact]
-        public void ServiceController_UpdateService_NotFound()
+        public void UpdateService_ErrorNotFound()
         {
             // Arrange
             var updatedService = new ServiceUpdateDTO()
@@ -295,15 +295,38 @@ namespace AcademyGestionGeneral_XUnitTest
             Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
         }
 
-        // Comentado debido a que falta implementar baja lógica:
-        //[Theory]
-        //[InlineData(1)]
-        //public void ServiceController_DeleteService_ReturnOK(int id)
-        //{
-        //    // Act
-        //    _serviceController.DeleteService(id);
-        //    // Assert
-        //    Assert.NotNull(_managementContextFake.Services.Find(id));
-        //}
+        /// <summary>
+        /// Este metodo prueba el Delete lógico de un servicio
+        /// </summary> 
+        [Fact]
+        public void DeleteService_ReturnOK()
+        {
+            //Arrange
+            int id = 1;
+
+            // Act
+            _serviceController.DeleteService(id);
+            // Assert
+            Assert.Equal(_managementContextFake.Services.Where(s => s.ServiceId == id).FirstOrDefault().Active, false);
+        }
+        
+        /// <summary>
+        /// Este metodo prueba el Delete lógico de un servicio inexistente
+        /// </summary> 
+        [Fact]
+        public void DeleteService_ErrorNotFound()
+        {
+            //Arrange
+            int id = 989;
+
+            var errorMessageExpected = $"No se encontró servicio con el Id: {id}";
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _serviceController.DeleteService(id));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(errorMessageExpected, keyNotFoundException?.Message);
+        }
     }
 }
