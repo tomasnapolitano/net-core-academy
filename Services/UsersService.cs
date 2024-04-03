@@ -112,7 +112,7 @@ namespace Services
             return consumptionDTO;
         }
 
-        public UserDTO PostUser(int userId, UserCreationDTO userCreationDTO, string token)
+        public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
 

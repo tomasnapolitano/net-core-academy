@@ -180,10 +180,10 @@ namespace AcademyGestionGeneral.Controllers
         /// <param name="userCreationDTO"></param>
         /// <returns></returns>
         [HttpPost]
-        public UserDTO PostUser(int userId , UserCreationDTO userCreationDTO)
+        public UserDTO PostUser(UserCreationDTO userCreationDTO)
         {
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            return _usersService.PostUser(userId , userCreationDTO, token);
+            return _usersService.PostUser(userCreationDTO, token);
         }
 
         // PUT: api/Users/1

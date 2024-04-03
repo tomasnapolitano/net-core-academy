@@ -34,7 +34,9 @@ namespace Repositories
 
         public async Task<List<LocationDTO>> GetLocations()
         {
-            var locations = await _context.Locations.ToListAsync();
+            var locations = await _context.Locations
+                                            .Include(d => d.District)
+                                            .ToListAsync();
 
             if (locations.Count == 0)
             {
