@@ -32,6 +32,18 @@ namespace Repositories
             return _mapper.Map<List<DistrictDTO>>(districts);
         }
 
+        public async Task<List<LocationDTO>> GetLocations()
+        {
+            var locations = await _context.Locations.ToListAsync();
+
+            if (locations.Count == 0)
+            {
+                throw new KeyNotFoundException("La lista de locaciones está vacía.");
+            }
+
+            return _mapper.Map<List<LocationDTO>>(locations);
+        }
+
         public async Task<DistrictDTO> GetDistrictById(int id)
         {
             var district = await _context.Districts
