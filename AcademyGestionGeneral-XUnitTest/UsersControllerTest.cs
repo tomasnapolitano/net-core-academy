@@ -1,6 +1,8 @@
 ﻿using AcademyGestionGeneral.Controllers;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Models.DTOs.Login;
 using Models.DTOs.User;
 using Models.Entities;
@@ -8,7 +10,15 @@ using Repositories;
 using Repositories.Utils;
 using Repositories.Utils.PasswordHasher;
 using Services;
+using Sprache;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 using Utils.Middleware;
+using Microsoft.AspNetCore.Http.Abstractions;
+using Moq;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace AcademyGestionGeneral_XUnitTest
 {
@@ -80,6 +90,35 @@ namespace AcademyGestionGeneral_XUnitTest
             _managementContextFake.Locations.AddRange(location);
             _managementContextFake.Districts.AddRange(district);
             _managementContextFake.SaveChanges();
+        }
+
+        private string GetToken(User user)
+        {
+            var jwt = new Jwt
+            {
+                Key = Environment.GetEnvironmentVariable("JWT_KEY"),
+                Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
+                Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE"),
+                Subject = Environment.GetEnvironmentVariable("JWT_SUBJECT")
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new Claim[]
+                {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Role, user.RoleId.ToString())
+                }),
+                Expires = DateTime.UtcNow.AddMinutes(30), // token expira en 30 minutos
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)), SecurityAlgorithms.HmacSha256Signature),
+                Issuer = jwt.Issuer,
+                Audience = jwt.Audience
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return tokenHandler.WriteToken(token);
         }
 
         /// <summary>
@@ -200,7 +239,20 @@ namespace AcademyGestionGeneral_XUnitTest
                 StreetName = "Test",
             };
 
+            string token = GetToken(_managementContextFake.Users.Find(1));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
+            };
+
             //Act
+
             var result = _usersController.PostUser(userId, newUser);
 
             //Assert
@@ -220,7 +272,7 @@ namespace AcademyGestionGeneral_XUnitTest
             {
                 FirstName = "Test",
                 LastName = "Test",
-                Dninumber = "42599687",
+                Dninumber = "42599689",
                 Neighborhood = "Test",
                 Password = "Test1234",
                 PostalCode = "B1704",
@@ -231,14 +283,26 @@ namespace AcademyGestionGeneral_XUnitTest
                 StreetName = "Test",
             };
 
-            var errorMessageExpected = "El id usuario enviado por parametro no puede crear usuarios. No es ADMIN/AGENTE";
+            var errorMessageExpected = "El usuario no tiene permisos para acceder a este recurso.";
+
+            string token = GetToken(_managementContextFake.Users.Find(3));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
+            };
 
             //Act
-            var badRequestException = Assert.Throws<BadRequestException>(() => _usersController.PostUser(userId, newUser));
-            Assert.Equal(errorMessageExpected, badRequestException.Message);
+            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
+            var innerException = aggregateException.InnerException;
 
             //Assert
-            Assert.Equal(errorMessageExpected, badRequestException?.Message);
+            Assert.Equal(errorMessageExpected, innerException?.Message);
         }
 
         /// <summary>
@@ -264,7 +328,19 @@ namespace AcademyGestionGeneral_XUnitTest
                 StreetName = "Test",
             };
 
-            var errorMessageExpected = $"El DNI ingresado ya existe, no puede crear un usuario con DNI: {newUser.Dninumber}"; 
+            var errorMessageExpected = $"El DNI ingresado ya existe, no puede crear un usuario con DNI: {newUser.Dninumber}";
+
+            string token = GetToken(_managementContextFake.Users.Find(1));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
+            };
 
             //Act
             var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
@@ -299,6 +375,18 @@ namespace AcademyGestionGeneral_XUnitTest
 
             var errorMessageExpected = $"No se encontró localidad con el codigo postal: {newUser.PostalCode}";
 
+            string token = GetToken(_managementContextFake.Users.Find(1));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
+            };
+
             //Act
             var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
             var innerException = aggregateException.InnerException;
@@ -311,7 +399,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Actualizar los datos de un usuario
         /// </summary>
         [Fact]
-        public void PutUser_ReturnsOk()
+        public void UpdateUser_ReturnsOk()
         {
             //Arrange
             var updateUser = new UserUpdateDTO()
@@ -320,6 +408,18 @@ namespace AcademyGestionGeneral_XUnitTest
                 FirstName = "Test",
                 LastName = "Test",
                 Email = "test@test.com",
+            };
+
+            string token = GetToken(_managementContextFake.Users.Find(1));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
             };
 
             //Act
@@ -360,6 +460,18 @@ namespace AcademyGestionGeneral_XUnitTest
             };
 
             var errorMessageExpected = $"No se encontró un usuario con el Id ingresado.";
+
+            string token = GetToken(_managementContextFake.Users.Find(1));
+
+            // Simulating Token header:
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockRequest = new Mock<HttpRequest>();
+            mockRequest.SetupGet(r => r.Headers["Authorization"]).Returns($"Bearer {token}");
+            mockHttpContext.SetupGet(c => c.Request).Returns(mockRequest.Object);
+            _usersController.ControllerContext = new ControllerContext
+            {
+                HttpContext = mockHttpContext.Object
+            };
 
             //Act
             var aggregateException = Assert.Throws<AggregateException>(() => _usersController.UpdateUser(updateUser));
