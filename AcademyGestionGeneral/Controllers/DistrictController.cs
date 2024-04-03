@@ -39,7 +39,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
-        [HttpGet("/locations")]
+        [HttpGet("locations")]
         public List<LocationDTO> GetLocations()
         {
             return _districtService.GetLocations();
