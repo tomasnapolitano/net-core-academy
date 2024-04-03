@@ -7,6 +7,7 @@ using Models.Entities;
 using Repositories;
 using Repositories.Utils;
 using Services;
+using System.Collections.Generic;
 using Utils.Middleware;
 
 namespace AcademyGestionGeneral_XUnitTest
@@ -68,11 +69,29 @@ namespace AcademyGestionGeneral_XUnitTest
                 new District() { DistrictId = 2  , DistrictName = "San Martin" , AgentId = 2}
             };
 
+            var serviceTypes = new List<ServiceType>()
+            {
+                new ServiceType() { ServiceTypeId = 1, Description = "test", ServiceTypeName = "test" }
+            };
+
+            var services = new List<Service>()
+            {
+                new Service() { ServiceId = 1, ServiceName = "TestService", PricePerUnit = 1000, ServiceTypeId = 1, Active = true }
+            };
+
+            var districtXservices = new List<DistrictXservice>()
+            {
+                new DistrictXservice() { DistrictXserviceId = 1, DistrictId = 1, ServiceId = 1, Active = true }
+            };
+
             _managementContextFake.Users.AddRange(users);
             _managementContextFake.UserRoles.AddRange(role);
             _managementContextFake.Addresses.AddRange(address);
             _managementContextFake.Locations.AddRange(location);
             _managementContextFake.Districts.AddRange(district);
+            _managementContextFake.DistrictXservices.AddRange(districtXservices);
+            _managementContextFake.ServiceTypes.AddRange(serviceTypes);
+            _managementContextFake.Services.AddRange(services);
             _managementContextFake.SaveChanges();
         }
 
@@ -80,7 +99,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba listado de Distritos
         /// </summary>
         [Fact]
-        public void GetDistricts_GetList_OkResult()
+        public void GetDistricts_OkResult()
         {
             //Act
             var result = _districtController.GetDistricts();         
@@ -90,13 +109,49 @@ namespace AcademyGestionGeneral_XUnitTest
         }
 
         /// <summary>
+        /// Este metodo prueba traer un Distrito con sus servicios disponibles
+        /// </summary>
+        [Fact]
+        public void GetDistrictWithServices_OkResult()
+        {
+            //Arrange
+            int id = 1;
+
+            //Act
+            var result = _districtController.GetDistrictWithServices(id);
+
+            //Assert
+            Assert.IsAssignableFrom<DistrictWithServicesDTO>(result);
+            Assert.Equal(this._managementContextFake.DistrictXservices.Where(dxs => dxs.DistrictId == id).ToList().Count, result.Services.Count);
+        }
+
+        /// <summary>
+        /// Este metodo prueba traer un Distrito con sus servicios disponibles cuando no se encuentra el distrito.
+        /// </summary>
+        [Fact]
+        public void GetDistrictWithServices_ErrorNotFound()
+        {
+            //Arrange
+            int id = 99;
+            string expectedError = "No se encontró el distrito.";
+
+            //Act
+            var exception = Assert.Throws<AggregateException>(() => _districtController.GetDistrictWithServices(id));
+            var keyNotFoundException = exception.InnerException is KeyNotFoundException ? exception.InnerException as KeyNotFoundException : null;
+
+            //Assert
+            Assert.Equal(expectedError, keyNotFoundException?.Message);
+
+        }
+
+        /// <summary>
         /// Este metodo prueba listado vacio de Distritos
         /// </summary>
         /// <remarks>
         /// se crea un contexto sin conexion a la base de datos ;
         /// </remarks>
         [Fact]
-        public void GetDistricts_GetList_EmptyResult()
+        public void GetDistricts_EmptyResult()
         {
             //Arrange
             var errorMessageExpected = "La lista de distritos está vacía.";
@@ -129,7 +184,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba buscar un distrito por id
         /// </summary>
         [Fact]
-        public void GetByDistrictId()
+        public void GetDistrictById_ReturnOk()
         {
             //Arrange
             var id = 1;
@@ -146,7 +201,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba buscar id no existente de District
         /// </summary>
         [Fact]
-        public void GetByIdDistrict_ReturnsInCorrectDistrict()
+        public void GetDistrictById_ErrorNotFound()
         {
             //Arrange
             var districtId = 1995;
@@ -165,7 +220,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Obtiene un distrito con su respectivo agente
         /// </summary>
         [Fact]
-        public void GetListDistrictsWithAgents_ReturnsOk()
+        public void GetDistrictsWithAgent_ReturnOk()
         {
             //Arrange
             var districtId = 2;
@@ -177,12 +232,70 @@ namespace AcademyGestionGeneral_XUnitTest
             Assert.Equal(districtId, result.DistrictId);
             Assert.False(result == null);
         }
+        
+        /// <summary>
+        /// Método para probar la asignación de un servicio en un distrito
+        /// </summary>
+        [Fact]
+        public void AddServiceToDistrict_ReturnOk()
+        {
+            //Arrange
+            int districtId = 2;
+            int serviceId = 1;
+
+            //Act
+            var result = _districtController.AddServiceToDistrict(districtId, serviceId);
+
+            //Assert
+            Assert.IsAssignableFrom<DistrictWithServicesDTO>(result);
+            Assert.NotNull(_managementContextFake.DistrictXservices.Where(dxs => dxs.DistrictId == districtId).FirstOrDefault());
+            Assert.Equal(_managementContextFake.DistrictXservices.Where(dxs => dxs.DistrictId == districtId).FirstOrDefault().ServiceId, serviceId);
+        }
+
+        /// <summary>
+        /// Método para probar la asignación de un servicio en un distrito, cuando ya está asignado
+        /// </summary>
+        [Fact]
+        public void AddServiceToDistrict_ErrorAlreadyAssigned()
+        {
+            //Arrange
+            int districtId = 1;
+            int serviceId = 1;
+            string expectedError = "El distrito ya posee este servicio.";
+
+            //Assert
+            var exception = Assert.Throws<AggregateException>(() => _districtController.AddServiceToDistrict(districtId, serviceId));
+            var innerException = exception.InnerException;
+
+            //Assert
+            Assert.Equal(expectedError, innerException?.Message);
+        }
+
+        /// <summary>
+        /// Método para probar la asignación de un servicio en un distrito, cuando ya está asignado
+        /// </summary>
+        [Fact]
+        public void DeactivateServiceByDistrict_ReturnOk()
+        {
+            //Arrange
+            int districtId = 1;
+            int serviceId = 1;
+
+            //Act
+            var result = _districtController.DeactivateServiceByDistrict(districtId, serviceId);
+
+            //Assert
+            Assert.IsAssignableFrom<DistrictWithServicesDTO>(result);
+            Assert.Equal(_managementContextFake.DistrictXservices
+                        .Where(dxs => dxs.DistrictId == districtId && dxs.ServiceId == serviceId)
+                        .FirstOrDefault().Active, false);
+        }
 
         /// <summary>
         /// Este metodo prueba buscar id de distrito sin agente existente
         /// </summary>
         [Fact]
-        public void GetListDistrictsWithAgents_ReturnsInCorrectDistrict()
+        public void GetDistrictsWithAgent_ErrorNoAgentAssigned()
         {
             //Arrange
             var districtId = 1;
@@ -201,7 +314,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba asignar un agente a un distrito sin agente
         /// </summary>
         [Fact]
-        public void GetAddAgentToDistrict_ReturnsOk()
+        public void AddAgentToDistrict_ReturnOk()
         {
             // Arrange
             var agentId = 2;
@@ -218,7 +331,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba asignar un usuario el cual no posee rol de agente
         /// </summary>
         [Fact]
-        public void GetAddAgentToDistrict_ReturnsBadRequestNotAgent()
+        public void AddAgentToDistrict_ErrorWrongRole()
         {
             // Arrange
             var agentId = 3;
@@ -238,7 +351,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba asignar un agente a un distrito con agente asignado
         /// </summary>
         [Fact]
-        public void GetAddAgentToDistrict_ReturnsBadRequestDistrictAgentExist()
+        public void AddAgentToDistrict_ErrorAgentAlreadyAssigned()
         {
             // Arrange
             var agentId = 2;
@@ -258,7 +371,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba remover un agente de un distrito
         /// </summary>
         [Fact]
-        public void GetRemoveAgentFromDistrict_ReturnsOk()
+        public void RemoveAgentFromDistrict_ReturnOk()
         {
             // Arrange
             var districtId = 2;
@@ -274,7 +387,7 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba remover un agente de un distrito sin agente
         /// </summary>
         [Fact]
-        public void GetRemoveAgentFromDistrict_ReturnsBadRequestNotAgentInDistrict()
+        public void RemoveAgentFromDistrict_ErrorNoAgentAssigned()
         {
             // Arrange
             var districtId = 1;
