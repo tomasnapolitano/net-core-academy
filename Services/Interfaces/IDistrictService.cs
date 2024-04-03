@@ -5,6 +5,7 @@ namespace Services.Interfaces
     public interface IDistrictService
     {
         List<DistrictDTO> GetDistricts();
+        List<LocationDTO> GetLocations();
         DistrictDTO GetDistrictById(int id);
         DistrictAgentDTO GetDistrictsWithAgent(int districtId);
         bool AddAgentToDistrict(int agentId, int districtId);

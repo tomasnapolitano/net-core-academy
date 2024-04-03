@@ -18,6 +18,11 @@ namespace Services
             return _districtRepository.GetDistricts().Result;
         }
 
+        public List<LocationDTO> GetLocations()
+        {
+            return _districtRepository.GetLocations().Result;
+        }
+
         public DistrictDTO GetDistrictById(int id)
         {
             return _districtRepository.GetDistrictById(id).Result;

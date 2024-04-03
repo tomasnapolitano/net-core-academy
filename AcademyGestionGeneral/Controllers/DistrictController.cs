@@ -31,6 +31,20 @@ namespace AcademyGestionGeneral.Controllers
             return _districtService.GetDistricts();
         }
 
+        // GET: api/District/Locations
+        /// <summary>
+        /// Obtiene todas las localidades
+        /// </summary>
+        /// <returns>Lista de Localidades</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("/locations")]
+        public List<LocationDTO> GetLocations()
+        {
+            return _districtService.GetLocations();
+        }
+
         // GET: api/District/5
         /// <summary>
         /// Obtiene un distrito
