@@ -17,7 +17,7 @@ namespace Services.Interfaces
         UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId);
         UserWithServicesDTO GetUserWithServices(int userId);
         ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId);
-        UserDTO PostUser(int userId , UserCreationDTO userCreationDTO, string token);
+        UserDTO PostUser(UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);
     }
