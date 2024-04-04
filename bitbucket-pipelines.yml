@@ -58,7 +58,6 @@ pipelines:
           services:
             - mysql
           script:
-            - apt-get update && apt-get install -y mysql-client
             - mysql -h mysql -u root -proot_password -e "CREATE TABLE IF NOT EXISTS mytable (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255));"
             - mysql -h mysql -u root -proot_password -e "INSERT INTO mytable (name) VALUES ('Example Data 1'), ('Example Data 2');"
 
