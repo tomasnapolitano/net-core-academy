@@ -129,7 +129,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
-        [HttpGet("{userId}/services")]
+        [HttpGet("services")]
         public List<UserWithServicesDTO> GetUsersWithServices()
         {
             return _usersService.GetUsersWithServices();
