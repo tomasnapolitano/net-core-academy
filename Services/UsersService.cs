@@ -71,9 +71,14 @@ namespace Services
             return _usersRepository.PauseSubscribeUserToService(subscriptionId).Result;
         }
 
-        public UserWithServicesDTO GetUserWithServices(int userId)
+        public List<UserWithServicesDTO> GetUsersWithServices()
         {
-            return _usersRepository.GetUserWithServices(userId).Result;
+            return _usersRepository.GetUsersWithServices().Result;
+        }
+
+        public UserWithServicesDTO GetUserWithServicesById(int userId)
+        {
+            return _usersRepository.GetUserWithServicesById(userId).Result;
         }
 
         public ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId)
