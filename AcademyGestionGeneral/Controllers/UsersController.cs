@@ -121,6 +121,20 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetAgentsWithDistrict(agentId);
         }
 
+        // GET: api/Users/services
+        /// <summary>
+        /// Obtiene un listado de usuarios con sus servicios suscritos
+        /// </summary>
+        /// <returns>List<UserWithServicesDTO>()</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("services")]
+        public List<UserWithServicesDTO> GetUsersWithServices()
+        {
+            return _usersService.GetUsersWithServices();
+        }
+
         // GET: api/Users/{userId}/services
         /// <summary>
         /// Obtiene un usuario con sus servicios suscritos
@@ -131,9 +145,9 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpGet("{userId}/services")]
-        public UserWithServicesDTO GetUserWithServices(int userId)
+        public UserWithServicesDTO GetUserWithServicesById(int userId)
         {
-            return _usersService.GetUserWithServices(userId);
+            return _usersService.GetUserWithServicesById(userId);
         }
 
         // POST: api/Users/1/services/subscribe

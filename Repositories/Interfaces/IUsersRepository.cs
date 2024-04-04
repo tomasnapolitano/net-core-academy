@@ -16,7 +16,8 @@ namespace Repositories.Interfaces
         Task<AgentDTO> GetAgentsWithDistrict(int agentId);
         Task<UserWithServicesDTO> SubscribeUserToService(int userId, int serviceId);
         Task<UserWithServicesDTO> PauseSubscribeUserToService(int subscriptionId);
-        Task<UserWithServicesDTO> GetUserWithServices(int userId);
+        Task<List<UserWithServicesDTO>> GetUsersWithServices();
+        Task<UserWithServicesDTO> GetUserWithServicesById(int userId);
         Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId);
         Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
