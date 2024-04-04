@@ -15,7 +15,8 @@ namespace Services.Interfaces
         List<UserDTO> GetUsersByDistrictId(int districtId);
         UserWithServicesDTO SubscribeUserToService(int userId, int serviceId);
         UserWithServicesDTO PauseSubscribeUserToService(int subscriptionId);
-        UserWithServicesDTO GetUserWithServices(int userId);
+        UserWithServicesDTO GetUserWithServicesById(int userId);
+        List<UserWithServicesDTO> GetUsersWithServices();
         ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId);
         UserDTO PostUser(UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
