@@ -15,7 +15,7 @@ definitions:
         - docker
       script:
         ## creo y guardo el tag y el image name para usar en kubectl despues
-        - echo "export IMAGE_NAME=mobydigital/$BITBUCKET_PROJECT_SLUG" >> docker-version.txt
+        - echo "export IMAGE_NAME=mobydigital/$BITBUCKET_REPO_SLUG" >> docker-version.txt
         - echo "export IMAGE_TAG=$BITBUCKET_BUILD_NUMBER" >> docker-version.txt
         - cat docker-version.txt
         - source docker-version.txt
