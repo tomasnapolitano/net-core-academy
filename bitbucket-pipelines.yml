@@ -38,27 +38,6 @@ definitions:
     artifacts:
       - docker-version.txt
 
-  code-review: &code-review
-    clone:
-      depth: full
-    script:
-      - dotnet tool install --global dotnet-sonarscanner
-      - dotnet tool install --global dotnet-coverage
-      - export PATH="$PATH:/root/.dotnet/tools"
-      - mkdir -p /etc/apt/keyrings
-      - curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | sudo gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg
-      - echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_18.x nodistro main" | sudo tee /etc/apt/sources.list.d/nodesource.list
-      - apt-get update
-      - apt install -y openjdk-17-jre-headless nodejs
-      - dotnet sonarscanner begin /d:sonar.token=${SONARQUBE_TOKEN} /d:sonar.host.url=${SONAR_HOST_URL} /v:"${BITBUCKET_BUILD_NUMBER}" $EXTRA_ARGS
-      - dotnet build --no-incremental
-      - dotnet-coverage collect 'dotnet test' -f xml  -o 'coverage.xml'
-      - dotnet sonarscanner end /d:sonar.token=${SONARQUBE_TOKEN}
-      - pipe: sonarsource/sonarqube-quality-gate:1.1.0
-        variables:
-          SONAR_TOKEN: ${SONARQUBE_TOKEN}
-          REPORT_FILE: '.sonarqube/out/.sonar/report-task.txt'
-
   deployk8s: &deployk8s
     image: mobydigital/backup-image
     clone: 
@@ -75,16 +54,16 @@ pipelines:
     ## Pipeline for NO-PRD DEPLOY
     develop:
       - step:
-          name: "ConfiguraciÃ³n de Base de Datos MySQL"
+          name: "Configuración de Base de Datos MySQL"
           services:
             - mysql
           script:
             - mysql -h mysql -u root -proot_password -e "CREATE TABLE IF NOT EXISTS mytable (id INT AUTO_INCREMENT PRIMARY KEY, name VARCHAR(255));"
             - mysql -h mysql -u root -proot_password -e "INSERT INTO mytable (name) VALUES ('Example Data 1'), ('Example Data 2');"
 
-      - step:
-          name: "Code Review SONARQUBE"
-          # <<: *code-review
+      #- step:
+      #    name: "Code Review SONARQUBE"
+      #    # <<: *code-review
 
       - step:
           name: "TODO TESTING"
