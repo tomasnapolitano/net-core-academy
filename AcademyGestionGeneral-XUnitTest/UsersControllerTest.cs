@@ -289,18 +289,31 @@ namespace AcademyGestionGeneral_XUnitTest
         /// Este metodo prueba traer un usuario con sus servicios
         /// </summary>
         [Fact]
-        public void GetUserWithServices_ReturnOk()
+        public void GetUserWithServicesById_ReturnOk()
         {
             //Arrange
             var id = 1;
 
             //Act
-            var result = _usersController.GetUserWithServices(id);
+            var result = _usersController.GetUserWithServicesById(id);
 
             //Assert           
             Assert.Equal(id, result.UserId);
             Assert.NotNull(result.ServiceSubscriptions);
             Assert.False(result == null);
+        }
+
+        /// <summary>
+        /// Este metodo prueba listado de Usuarios con sus subscripciones a servicios.
+        /// </summary>
+        [Fact]
+        public void GetUsersWithServices_OkResult()
+        {
+            //Act
+            var result = _usersController.GetUsersWithServices();
+
+            //Assert            
+            Assert.Equal(this._managementContextFake.Users.ToList().Count, result.Count);
         }
 
         /// <summary>
@@ -398,7 +411,6 @@ namespace AcademyGestionGeneral_XUnitTest
         public void PostUser_ReturnsOk()
         {
             //Arrange
-            var userId = 1;
             var newUser = new UserCreationDTO() 
             {
                 FirstName = "Test",
@@ -428,7 +440,7 @@ namespace AcademyGestionGeneral_XUnitTest
 
             //Act
 
-            var result = _usersController.PostUser(userId, newUser);
+            var result = _usersController.PostUser(newUser);
 
             //Assert
             Assert.NotNull(result);
@@ -442,7 +454,6 @@ namespace AcademyGestionGeneral_XUnitTest
         public void PostUser_ReturnExceptionUserRoleInvalid()
         {
             //Arrange
-            var userId = 3;
             var newUser = new UserCreationDTO()
             {
                 FirstName = "Test",
@@ -473,7 +484,7 @@ namespace AcademyGestionGeneral_XUnitTest
             };
 
             //Act
-            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
+            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(newUser));
             var innerException = aggregateException.InnerException;
 
             //Assert
@@ -487,7 +498,6 @@ namespace AcademyGestionGeneral_XUnitTest
         public void PostUser_ReturnExceptionDniExists()
         {
             //Arrange
-            var userId = 1;
             var newUser = new UserCreationDTO()
             {
                 FirstName = "Test",
@@ -518,7 +528,7 @@ namespace AcademyGestionGeneral_XUnitTest
             };
 
             //Act
-            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
+            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(newUser));
             var innerException = aggregateException.InnerException;
 
             //Assert
@@ -532,7 +542,6 @@ namespace AcademyGestionGeneral_XUnitTest
         public void PostUser_ReturnExceptionLocationNotFound()
         {
             //Arrange
-            var userId = 1;
             var newUser = new UserCreationDTO()
             {
                 FirstName = "Test",
@@ -563,7 +572,7 @@ namespace AcademyGestionGeneral_XUnitTest
             };
 
             //Act
-            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(userId, newUser));
+            var aggregateException = Assert.Throws<AggregateException>(() => _usersController.PostUser(newUser));
             var innerException = aggregateException.InnerException;
 
             //Assert
