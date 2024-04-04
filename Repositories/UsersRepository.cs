@@ -210,7 +210,7 @@ namespace Repositories
 
             if (existingSubscription != null)
             { // Ya está suscrito:
-                return await GetUserWithServices(userId);
+                return await GetUserWithServicesById(userId);
             }
 
             // No está suscrito. Creando la suscripción:
@@ -225,7 +225,7 @@ namespace Repositories
             await _context.AddAsync(subscription);
             await _context.SaveChangesAsync();
 
-            return await GetUserWithServices(userId);
+            return await GetUserWithServicesById(userId);
         }
 
         public async Task<UserWithServicesDTO> PauseSubscribeUserToService(int subscriptionId)
@@ -255,10 +255,60 @@ namespace Repositories
                 .Property(x => x.PauseSubscription).IsModified = true;
             await _context.SaveChangesAsync();
 
-            return await GetUserWithServices((int)subscription.UserId);
+            return await GetUserWithServicesById((int)subscription.UserId);
         }
 
-        public async Task<UserWithServicesDTO> GetUserWithServices(int userId)
+        public async Task<List<UserWithServicesDTO>> GetUsersWithServices()
+        {
+            var usersWithServicesDTO = new List<UserWithServicesDTO>();
+
+            var users = await _context.Users
+                                       .Include(u => u.Address)
+                                       .ThenInclude(a => a.Location)
+                                       .ThenInclude(l => l.District)
+                                       .ToListAsync();
+
+            foreach (var user in users)
+            {
+                var userWithServicesDTO = _mapper.Map<UserWithServicesDTO>(user);
+
+                var subscriptionQueryResult = await _context.ServiceSubscriptions
+                                                            .Include(s => s.DistrictXservice)
+                                                            .ThenInclude(dxs => dxs.Service)
+                                                            .Where(x => x.UserId == user.UserId
+                                                                && x.DistrictXservice.Active == true
+                                                                && x.DistrictXservice.Service.Active == true)
+                                                            .ToListAsync();
+
+                foreach (var subscription in subscriptionQueryResult)
+                {
+                    ServiceDTO serviceDTO = new ServiceDTO()
+                    {
+                        ServiceId = subscription.DistrictXservice.Service.ServiceId,
+                        ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
+                        ServiceName = subscription.DistrictXservice.Service.ServiceName,
+                        PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                    };
+
+                    ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
+                    {
+                        SubscriptionId = subscription.SubscriptionId,
+                        UserId = user.UserId,
+                        DistrictXservice = _mapper.Map<DistrictXserviceDTO>(subscription.DistrictXservice),
+                        StartDate = subscription.StartDate,
+                        PauseSubscription = subscription.PauseSubscription,
+                        Service = serviceDTO
+                    };
+                    userWithServicesDTO.ServiceSubscriptions.Add(serviceSubscriptionDTO);
+                }
+
+                usersWithServicesDTO.Add(userWithServicesDTO);
+            }
+
+            return usersWithServicesDTO;
+        }
+
+        public async Task<UserWithServicesDTO> GetUserWithServicesById(int userId)
         {
             var user = await _context.Users.Include(u => u.Address)
                                            .ThenInclude(a => a.Location)
