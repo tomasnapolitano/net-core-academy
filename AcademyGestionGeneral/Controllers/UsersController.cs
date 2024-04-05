@@ -169,7 +169,7 @@ namespace AcademyGestionGeneral.Controllers
         /// </summary>
         /// <param name="subscriptionId"></param>
         /// <returns>ConsumptionDTO</returns> 
-        [HttpGet("api/Users/subscription/{subscriptionId}")]
+        [HttpGet("subscription/{subscriptionId}")]
         public ConsumptionDTO GetSubscriptionConsumption(int subscriptionId)
         {
             return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
