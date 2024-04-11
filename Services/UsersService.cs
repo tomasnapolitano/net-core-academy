@@ -101,6 +101,16 @@ namespace Services
             return _usersRepository.GetBillById(billId).Result;
         }
 
+        public List<ConsumptionBillDTO> GetBillsByUserId(int userId)
+        {
+            return _usersRepository.GetBillsByUserId(userId).Result;
+        }
+
+        public List<ConsumptionBillDTO> GetAllBills()
+        {
+            return _usersRepository.GetAllBills().Result;
+        }
+
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
