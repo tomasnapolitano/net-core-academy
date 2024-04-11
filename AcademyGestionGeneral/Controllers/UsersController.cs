@@ -216,6 +216,29 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetBillById(billId);
         }
 
+        // GET: api/Users/1/bills
+        /// <summary>
+        ///  Obtiene todas las facturas de un usuario por id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>List<ConsumptionDTO></returns> 
+        [HttpGet("{userId}/bills")]
+        public List<ConsumptionBillDTO> GetBillsByUserId(int userId)
+        {
+            return _usersService.GetBillsByUserId(userId);
+        }
+
+        // GET: api/Users/bills
+        /// <summary>
+        ///  Obtiene todas las facturas.
+        /// </summary>
+        /// <returns>List<ConsumptionBillDTO></returns> 
+        [HttpGet("bills")]
+        public List<ConsumptionBillDTO> GetAllBills()
+        {
+            return _usersService.GetAllBills();
+        }
+
         // PUT: api/Users/services/1/pausesubscribe
         /// <summary>
         /// Pausa la suscripción de un usuario a un servicio específico.
