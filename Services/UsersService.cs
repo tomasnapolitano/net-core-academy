@@ -1,4 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
+using Models.DTOs;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
@@ -119,9 +120,15 @@ namespace Services
 
         public ConsumptionBillPdf GetConsumptionBillPdf(int consumptionBillId)
         {
-            // obtengo la BillDTO (repositorio)
-            // paso el billDTO a método que genere el PDF (service, ya que no contacta a la BD)
-            // retorno archivo PDF
+            //     obtengo la BillDTO (repositorio) 
+            // ConsumptionBillDTO billDTO = _usersRepository.GetConsumptionBill(consumptionBillId);
+
+            //     paso el billDTO a método que genere el PDF (service, ya que no contacta a la BD) (GenerateConsumptionBillPdf)
+             var billPdf = new ConsumptionBillPdf(billDTO);
+            //     paso PDF a Stream
+             billPdf.GeneratePdf()
+
+            //     Retorno file/stream
         }
 
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
@@ -169,6 +176,11 @@ namespace Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
+        }
+
+        private ConsumptionBillPdf GenerateConsumptionBillPdf(ConsumptionBillDTO billDTO)
+        {
+
         }
     }
 }
