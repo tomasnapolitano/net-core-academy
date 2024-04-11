@@ -9,7 +9,7 @@
 
         public int LocationId { get; set; }
         public string LocationName { get; set; } = null!;
-        public int DistrictId { get; set; }
+        public int? DistrictId { get; set; }
         public string PostalCode { get; set; } = null!;
 
         public virtual District? District { get; set; }

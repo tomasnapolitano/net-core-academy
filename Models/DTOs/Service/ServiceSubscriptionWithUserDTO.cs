@@ -1,5 +1,4 @@
 ﻿using Models.DTOs.User;
-using Models.Entities;
 
 namespace Models.DTOs.Service
 {

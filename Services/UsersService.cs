@@ -1,4 +1,5 @@
 using Microsoft.IdentityModel.Tokens;
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
@@ -9,7 +10,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Utils.CustomValidator;
-using Utils.Enum;
 using Utils.Middleware;
 
 namespace Services
@@ -81,40 +81,19 @@ namespace Services
             return _usersRepository.GetUserWithServicesById(userId).Result;
         }
 
+        public ServiceSubscriptionWithUserDTO GetServiceSubscriptionClient(int subscriptionId)
+        {
+            return _usersRepository.GetSubscription(subscriptionId).Result;
+        }
+
         public ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId)
         {
-            var subscription = _usersRepository.GetSubscription(subscriptionId).Result;
+            return _usersRepository.GetRandomSubscriptionConsumption(subscriptionId).Result;
+        }
 
-            if (subscription.PauseSubscription == true)
-                throw new UnavailableServiceException("La suscripción está pausada actualmente.");
-
-            if (subscription.DistrictXservice.Active == false)
-                throw new UnavailableServiceException("El servicio no se encuentra disponible para este distrito actualmente.");
-
-            if (subscription.Service.Active == false)
-                throw new UnavailableServiceException("El servicio no se encuentra disponible en este momento.");
-
-            // Se calcula la cantidad de días a cobrar:
-            DateTime firstDayCurrentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
-            DateTime firstDate = subscription.StartDate < firstDayCurrentMonth ? firstDayCurrentMonth : subscription.StartDate;
-            TimeSpan daysOfConsumptionSpan = DateTime.Today - firstDate;
-            int daysOfConsumption = (int)daysOfConsumptionSpan.TotalDays;
-
-            // Se genera un número random de consumo (igual para todos los días):
-            Random random = new Random();
-            float dailyConsumption = (float)(random.NextDouble() * 10);
-
-            // Calculo el costo total de consumo:
-            float totalConsumption = daysOfConsumption * dailyConsumption;
-            ConsumptionDTO consumptionDTO = new ConsumptionDTO()
-            {
-                DaysOfConsumption = daysOfConsumption,
-                UnitsConsumed = totalConsumption,
-                TotalCost = (float)(totalConsumption * subscription.Service.PricePerUnit),
-                ServiceSubscription = subscription
-            };
-
-            return consumptionDTO;
+        public ConsumptionBillDTO GenerateBill(int userId)
+        {
+            return _usersRepository.GenerateBill(userId).Result;
         }
 
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
