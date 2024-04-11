@@ -202,6 +202,18 @@ namespace AcademyGestionGeneral.Controllers
         public ConsumptionBillDTO GenerateBill(int userId)
         {
             return _usersService.GenerateBill(userId);
+        } // ------ api/Users/{userId}/bills/generate -----------------------------
+
+        // GET: api/Users/bills/1
+        /// <summary>
+        ///  Obtiene la los datos de una factura por Id.
+        /// </summary>
+        /// <param name="billId"></param>
+        /// <returns>ConsumptionDTO</returns> 
+        [HttpGet("bills/{billId}")]
+        public ConsumptionBillDTO GetBillById(int billId)
+        {
+            return _usersService.GetBillById(billId);
         }
 
         // PUT: api/Users/services/1/pausesubscribe
