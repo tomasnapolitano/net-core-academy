@@ -163,7 +163,7 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.SubscribeUserToService(userId, serviceId);
         }
 
-        // GET: api/Users/1/services/1/consumption
+        // GET: api/Users/subscription/1
         /// <summary>
         ///  Obtiene la consumisión de un usuario sobre un servicio al que está suscrito.
         /// </summary>
@@ -173,6 +173,18 @@ namespace AcademyGestionGeneral.Controllers
         public ConsumptionDTO GetSubscriptionConsumption(int subscriptionId)
         {
             return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
+        }
+
+        // GET: api/Users/consumptionBill/1/pdf
+        /// <summary>
+        ///  Obtiene una factura en formato PDF.
+        /// </summary>
+        /// <param name="consumptionBillId"></param>
+        /// <returns>ConsumptionBillPdf</returns> 
+        [HttpGet("consumptionBill/{consumptionBillId}/pdf")]
+        public ConsumptionBillPdf GetConsumptionBillPdf(int consumptionBillId)
+        {
+            return _usersService.GetConsumptionBillPdf(consumptionBillId);
         }
 
         // PUT: api/Users/services/1/pausesubscribe

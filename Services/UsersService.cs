@@ -117,6 +117,13 @@ namespace Services
             return consumptionDTO;
         }
 
+        public ConsumptionBillPdf GetConsumptionBillPdf(int consumptionBillId)
+        {
+            // obtengo la BillDTO (repositorio)
+            // paso el billDTO a método que genere el PDF (service, ya que no contacta a la BD)
+            // retorno archivo PDF
+        }
+
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
