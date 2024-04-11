@@ -21,6 +21,7 @@ namespace Services.Interfaces
         ServiceSubscriptionWithUserDTO GetServiceSubscriptionClient(int subscriptionId);
         ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId);
         ConsumptionBillDTO GenerateBill(int userId);
+        ConsumptionBillDTO GetBillById(int billId);
         UserDTO PostUser(UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);
