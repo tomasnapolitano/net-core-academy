@@ -439,11 +439,11 @@ namespace Repositories
             // Sumar para obtener el Total
             double total = 0;
 
-            ConsumptionBillDTO consumptionBilldto = new ConsumptionBillDTO
+            ConsumptionBill consumptionBill = new ConsumptionBill
             {
                 UserId = userId,
                 BillStatusId = 2, // El estado inicial de la factura es id = 2 'Pendiente'
-                BillDate = DateTime.Now, 
+                BillDate = DateTime.Now,
                 Total = 0
             };
 
@@ -469,9 +469,8 @@ namespace Repositories
             }
 
             // Calcular el total de la factura sumando los detalles de la factura
-            consumptionBilldto.Total = total;
+            consumptionBill.Total = total;
 
-            ConsumptionBill consumptionBill = _mapper.Map<ConsumptionBill>(consumptionBilldto);
             _context.ConsumptionBills.Add(consumptionBill);
             await _context.SaveChangesAsync();
 
@@ -486,7 +485,53 @@ namespace Repositories
             _context.BillDetails.AddRange(billDetailEntities);
             await _context.SaveChangesAsync();
 
+            ConsumptionBillDTO billToReturn = _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+            billToReturn.User = _mapper.Map<UserDTO>(user);
+            billToReturn.BillDetails = billDetails;
+
+            return billToReturn;
+        }
+
+        public async Task<ConsumptionBillDTO> GetBillById(int billId)
+        {
+            ConsumptionBill consumptionBill = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .FirstOrDefaultAsync(cb => cb.ConsumptionBillId == billId);
+            
+            if (consumptionBill == null)
+            {
+                throw new KeyNotFoundException("No se pudo encontrar la factura.");
+            }
+
             return _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+        }
+
+        public async Task<List<ConsumptionBillDTO>> GetAllBills()
+        {
+            List<ConsumptionBill> allBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .ToListAsync();
+
+            return _mapper.Map<List<ConsumptionBillDTO>>(allBills);
+        }
+
+        public async Task<List<ConsumptionBillDTO>> GetBillsByUserId(int userId)
+        {
+            List<ConsumptionBill> userBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .Where(cb => cb.UserId == userId)
+                                                                    .ToListAsync();
+
+            return _mapper.Map<List<ConsumptionBillDTO>>(userBills);
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
