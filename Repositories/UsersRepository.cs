@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
@@ -369,6 +370,123 @@ namespace Repositories
             subscription.User = await GetUserById(subscription.User.UserId);
 
             return _mapper.Map<ServiceSubscriptionWithUserDTO>(subscription);
+        }
+
+        public async Task<ConsumptionDTO> GetRandomSubscriptionConsumption(int subscriptionId)
+        {
+            ServiceSubscriptionWithUserDTO subscription = await GetSubscription(subscriptionId);
+
+            if (subscription.PauseSubscription)
+                throw new UnavailableServiceException("La suscripción está pausada actualmente.");
+
+            if (!subscription.DistrictXservice.Active)
+                throw new UnavailableServiceException("El servicio no se encuentra disponible para este distrito actualmente.");
+
+            if (!subscription.Service.Active)
+                throw new UnavailableServiceException("El servicio no se encuentra disponible en este momento.");
+
+            // Se calcula la cantidad de días a cobrar:
+            DateTime firstDayCurrentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            DateTime firstDate = subscription.StartDate < firstDayCurrentMonth ? firstDayCurrentMonth : subscription.StartDate;
+            TimeSpan daysOfConsumptionSpan = DateTime.Today - firstDate;
+            int daysOfConsumption = (int)daysOfConsumptionSpan.TotalDays;
+
+            // Se genera un número random de consumo (igual para todos los días):
+            Random random = new Random();
+            float dailyConsumption = (float)(random.NextDouble() * 10);
+
+            // Calculo el costo total de consumo:
+            float totalConsumption = daysOfConsumption * dailyConsumption;
+
+            ConsumptionDTO consumptionDTO = new ConsumptionDTO()
+            {
+                DaysOfConsumption = daysOfConsumption,
+                UnitsConsumed = totalConsumption,
+                TotalCost = (float)(totalConsumption * subscription.Service.PricePerUnit),
+                ServiceSubscription = subscription
+            };
+
+            return consumptionDTO;
+        }
+
+        public async Task<ConsumptionBillDTO> GenerateBill(int userId)
+        {
+            UserWithServicesDTO user = await GetUserWithServicesById(userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+
+            if (user.ServiceSubscriptions == null || !user.ServiceSubscriptions.Any())
+            {
+                throw new KeyNotFoundException("El usuario no está subscrito a ningún servicio.");
+            }
+
+            DateTime today = DateTime.Today;
+            ConsumptionBill existingConsumptionBill = await _context.ConsumptionBills
+                                                                    .FirstOrDefaultAsync(cb => cb.UserId == userId &&
+                                                                                                cb.BillDate.Year == today.Year &&
+                                                                                                cb.BillDate.Month == today.Month);
+
+            if (existingConsumptionBill != null)
+            {
+                throw new BadRequestException("Ya existe una factura creada este mes para este usuario.");
+            }
+
+            List<BillDetailDTO> billDetails = new List<BillDetailDTO>();
+
+            // Sumar para obtener el Total
+            double total = 0;
+
+            ConsumptionBillDTO consumptionBilldto = new ConsumptionBillDTO
+            {
+                UserId = userId,
+                BillStatusId = 2, // El estado inicial de la factura es id = 2 'Pendiente'
+                BillDate = DateTime.Now, 
+                Total = 0
+            };
+
+            foreach (var subscription in user.ServiceSubscriptions)
+            {
+                if (subscription.PauseSubscription)
+                    continue;
+
+                // Obtenemos la consumición del servicio al que está suscripto el cliente
+                ConsumptionDTO consumptionSubscription = await GetRandomSubscriptionConsumption(subscription.SubscriptionId);
+
+                var newBillDetail = new BillDetailDTO
+                {
+                    SubscriptionId = subscription.SubscriptionId,
+                    ConsumptionBillId = 0, // Como aún no se ha creado la factura completa, mantenemos el valor en cero
+                    UnitsConsumed = consumptionSubscription.UnitsConsumed,
+                    DaysBilled = consumptionSubscription.DaysOfConsumption,
+                    PricePerUnit = subscription.Service.PricePerUnit
+                };
+
+                total += consumptionSubscription.UnitsConsumed * subscription.Service.PricePerUnit;
+                billDetails.Add(newBillDetail);
+            }
+
+            // Calcular el total de la factura sumando los detalles de la factura
+            consumptionBilldto.Total = total;
+
+            ConsumptionBill consumptionBill = _mapper.Map<ConsumptionBill>(consumptionBilldto);
+            _context.ConsumptionBills.Add(consumptionBill);
+            await _context.SaveChangesAsync();
+
+            foreach (var billDetail in billDetails)
+            {
+                billDetail.ConsumptionBillId = consumptionBill.ConsumptionBillId;
+            }
+
+            // Antes de guardar los detalles de la factura en la base de datos
+            var billDetailEntities = billDetails.Select(bd => _mapper.Map<BillDetail>(bd)).ToList();
+
+            _context.BillDetails.AddRange(billDetailEntities);
+            await _context.SaveChangesAsync();
+
+            return _mapper.Map<ConsumptionBillDTO>(consumptionBill);
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)

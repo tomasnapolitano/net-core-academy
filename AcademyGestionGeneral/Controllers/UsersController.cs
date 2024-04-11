@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
+using Services;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -163,16 +165,43 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.SubscribeUserToService(userId, serviceId);
         }
 
-        // GET: api/Users/1/services/1/consumption
+        // GET: api/Users/subscription/1
+        /// <summary>
+        ///  Obtiene la subscripción al servicio de un usuario.
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns>ServiceSubscriptionWithUserDTO</returns> 
+        [HttpGet("subscription/{subscriptionId}")]
+        public ServiceSubscriptionWithUserDTO GetServiceSubscriptionClient(int subscriptionId)
+        {
+            return _usersService.GetServiceSubscriptionClient(subscriptionId);
+        }
+
+        // GET: api/Users/subscription/1/consumption
         /// <summary>
         ///  Obtiene la consumisión de un usuario sobre un servicio al que está suscrito.
         /// </summary>
         /// <param name="subscriptionId"></param>
         /// <returns>ConsumptionDTO</returns> 
-        [HttpGet("subscription/{subscriptionId}")]
+        [HttpGet("subscription/{subscriptionId}/consumption")]
         public ConsumptionDTO GetSubscriptionConsumption(int subscriptionId)
         {
             return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
+        }
+
+        // POST: api/Users/bill/{userId}/generate
+        /// <summary>
+        /// Genera las facturas del cliente elegido
+        /// </summary>
+        /// <param name="userId">ID del usuario</param>
+        /// <returns>BillDetailDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost("bill/{userId}/generate")]
+        public ConsumptionBillDTO GenerateBill(int userId)
+        {
+            return _usersService.GenerateBill(userId);
         }
 
         // PUT: api/Users/services/1/pausesubscribe

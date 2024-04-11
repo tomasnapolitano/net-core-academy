@@ -1,7 +1,4 @@
-﻿using Models.DTOs.User;
-using Models.Entities;
-
-namespace Models.DTOs.Service
+﻿namespace Models.DTOs.Service
 {
     public class ServiceSubscriptionDTO
     {

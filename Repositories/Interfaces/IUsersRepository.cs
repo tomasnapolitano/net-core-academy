@@ -1,3 +1,4 @@
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
@@ -19,8 +20,10 @@ namespace Repositories.Interfaces
         Task<List<UserWithServicesDTO>> GetUsersWithServices();
         Task<UserWithServicesDTO> GetUserWithServicesById(int userId);
         Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId);
+        Task<ConsumptionDTO> GetRandomSubscriptionConsumption(int subscriptionId);
         Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         Task<UserDTO> DeleteUser(int id, string token);
+        Task<ConsumptionBillDTO> GenerateBill(int userId);
     }
 }
