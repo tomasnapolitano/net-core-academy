@@ -25,7 +25,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <summary>
         /// Login a la plataforma
         /// </summary>
-        /// <returns>Bool</returns>
+        /// <returns>UserWithTokenDTO</returns>
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
@@ -34,6 +34,21 @@ namespace AcademyGestionGeneral.Controllers
         public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
         {
             return _usersService.Login(userLoginDTO);
+        }
+
+        // PUT: api/Users/password
+        /// <summary>
+        /// Cambio de contraseña del usuario
+        /// </summary>
+        /// <param name="userUpdatePassDTO"></param>
+        /// <returns>Bool</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("password")]
+        public bool ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO)
+        {
+            return _usersService.ChangePassword(userUpdatePassDTO);
         }
 
         // GET: api/Users

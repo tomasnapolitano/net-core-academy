@@ -8,6 +8,7 @@ namespace Repositories.Interfaces
     public interface IUsersRepository
     {
         Task<UserWithTokenDTO> Login(UserLoginDTO userLoginDTO);
+        Task<bool> ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO);
         Task<List<UserDTO>> GetUsers();
         Task<List<UserDTO>> GetActiveUsers();
         Task<List<UserDTO>> GetAllAgent();

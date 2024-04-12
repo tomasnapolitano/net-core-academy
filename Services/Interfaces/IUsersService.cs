@@ -8,6 +8,7 @@ namespace Services.Interfaces
     public interface IUsersService
     {
         UserWithTokenDTO Login(UserLoginDTO userLoginDTO);
+        bool ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO);
         List<UserDTO> GetUsers();
         List<UserDTO> GetActiveUsers();
         List<UserDTO> GetAllAgents();

@@ -46,9 +46,34 @@ namespace Repositories
             return _mapper.Map<UserWithTokenDTO>(searchedUser);
         }
 
+        public async Task<bool> ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO)
+        {
+            User searchedUser = await _context.Users.Where(u =>
+                                                 u.Email == userUpdatePassDTO.Email)
+                                             .FirstOrDefaultAsync();
+
+            if (searchedUser == null)
+                throw new KeyNotFoundException("El email ingresado no tiene una cuenta asociada. Por favor comuníquese con su Agente asignado para dar de alta su cuenta.");
+
+            if (!_passwordHasher.Verify(searchedUser.Password, userUpdatePassDTO.OldPassword))
+                throw new BadRequestException("La contraseña ingresada no es correcta.");
+
+            List<string> passwordErrors = VerifyPassword(userUpdatePassDTO.OldPassword, userUpdatePassDTO.NewPassword);
+            if (passwordErrors.Any())
+            {
+                throw new BadRequestException("La contraseña ingresada no cumple los requisitos: " + string.Join(" ", passwordErrors));
+            }
+
+            // le cambiamos la contraseña, primero haciendole un Hash
+            searchedUser.Password = _passwordHasher.Hash(userUpdatePassDTO.NewPassword);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<UserDTO>> GetUsers()
         {
-            var users = await _context.Users.Include(u => u.Address)
+            List<User> users = await _context.Users.Include(u => u.Address)
                                             .ThenInclude(a => a.Location)
                                             .ThenInclude(l => l.District)
                                             .ToListAsync();
@@ -63,7 +88,7 @@ namespace Repositories
 
         public async Task<List<UserDTO>> GetActiveUsers()
         {
-            var users = await _context.Users.Where(x => x.Active == true)
+            List<User> users = await _context.Users.Where(x => x.Active == true)
                                             .Include(u => u.Address)
                                             .ThenInclude(a => a.Location)
                                             .ThenInclude(l => l.District)
@@ -688,6 +713,61 @@ namespace Repositories
         {
             return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
         }
+        private List<string> VerifyPassword(string oldpass, string newpass)
+        {
+            List<string> errors = new List<string>();
+
+            // Verificar que la nueva contraseña y la vieja no sean iguales
+            if (oldpass == newpass)
+                errors.Add("La nueva contraseña no puede ser igual a la contraseña anterior.");
+
+            // Verificar longitud de la nueva contraseña (entre 8 y 16 caracteres)
+            if (newpass.Length < 8 || newpass.Length > 16)
+                errors.Add("La contraseña debe tener entre 8 y 16 caracteres.");
+
+            // Verificar si la nueva contraseña contiene caracteres alfanuméricos
+            bool hasAlphanumeric = false;
+            foreach (char c in newpass)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    hasAlphanumeric = true;
+                    break;
+                }
+            }
+            if (!hasAlphanumeric)
+                errors.Add("La contraseña debe contener al menos un carácter alfanumérico.");
+
+            // Verificar si la nueva contraseña contiene al menos un carácter en mayúscula y uno en minúscula
+            bool hasUpperCase = false;
+            bool hasLowerCase = false;
+            foreach (char c in newpass)
+            {
+                if (char.IsUpper(c))
+                    hasUpperCase = true;
+                if (char.IsLower(c))
+                    hasLowerCase = true;
+            }
+            if (!hasUpperCase || !hasLowerCase)
+                errors.Add("La contraseña debe contener al menos una letra mayúscula y una minúscula.");
+
+            // Verificar si la nueva contraseña contiene al menos un carácter especial
+            string specialCharacters = @"!@#$%^&*()-_+=[]{}|;:'<>,.?/";
+            bool hasSpecialCharacter = false;
+            foreach (char c in newpass)
+            {
+                if (specialCharacters.Contains(c))
+                {
+                    hasSpecialCharacter = true;
+                    break;
+                }
+            }
+            if (!hasSpecialCharacter)
+                errors.Add("La contraseña debe contener al menos un carácter especial.");
+
+            return errors;
+        }
+
         private string[] GetRolesFromToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();
