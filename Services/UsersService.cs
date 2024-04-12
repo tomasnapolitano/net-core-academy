@@ -31,6 +31,11 @@ namespace Services
             return userWithToken;
         }
 
+        public bool ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO)
+        {
+            return _usersRepository.ChangePassword(userUpdatePassDTO).Result;
+        }
+
         public List<UserDTO> GetUsers()
         {
             return _usersRepository.GetUsers().Result;
