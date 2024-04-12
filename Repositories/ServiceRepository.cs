@@ -93,6 +93,11 @@ namespace Repositories
                 throw new KeyNotFoundException($"No se encontró servicio con el Id: {serviceUpdateDTO.ServiceId}");
             }
 
+            if (existingService.Active == false)
+            {
+                throw new BadRequestException("Este servicio se encuentra deshabilitado.");
+            }
+
             _context.Entry(existingService).CurrentValues.SetValues(updatedService);
             await _context.SaveChangesAsync();
 
