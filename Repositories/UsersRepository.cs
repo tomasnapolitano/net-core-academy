@@ -40,7 +40,8 @@ namespace Repositories
             if (!_passwordHasher.Verify(searchedUser.Password, userLoginDTO.Password))
                 throw new BadRequestException("La contraseña ingresada no es correcta.");
 
-            // crear una custom exception para error de login?
+            /*if (searchedUser.Active == false)
+                throw new BadRequestException("Este usuario no se encuentra Activo.");*/
 
             return _mapper.Map<UserWithTokenDTO>(searchedUser);
         }
@@ -99,6 +100,11 @@ namespace Repositories
             if(user == null)
             {
                 throw new KeyNotFoundException($"No se encontró el usuario con rol id igual a :{id}");
+            }
+
+            if(user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
             }
 
             return user.RoleId;
@@ -161,6 +167,11 @@ namespace Repositories
                 throw new BadRequestException("El usuario no posee rol de agente.");
             }
 
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             return _mapper.Map<AgentDTO>(user);
         }
 
@@ -182,6 +193,10 @@ namespace Repositories
             if (user.Address.Location.District == null)
             {
                 throw new KeyNotFoundException("El usuario no tiene distrito asignado.");
+            }
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
             }
 
             var service = await _context.Services.FindAsync(serviceId);
@@ -318,6 +333,11 @@ namespace Repositories
 
             if (user == null)
                 throw new KeyNotFoundException("No se encontró el usuario.");
+
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
 
             var userWithServicesDTO = _mapper.Map<UserWithServicesDTO>(user);
             var subscriptionQueryResult = await _context.ServiceSubscriptions
@@ -614,6 +634,11 @@ namespace Repositories
                 throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
             }
 
+            if (existingUser.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             existingUser.FirstName = userUpdateDTO.FirstName;
             existingUser.LastName = userUpdateDTO.LastName;
             existingUser.Email = userUpdateDTO.Email;
@@ -638,6 +663,11 @@ namespace Repositories
             if (existingUser == null)
             {
                 throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
+            }
+
+            if (existingUser.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
             }
 
             existingUser.Active = false;
