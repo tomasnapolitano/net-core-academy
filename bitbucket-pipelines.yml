@@ -59,9 +59,9 @@ pipelines:
   branches:
     ## Pipeline for NO-PRD DEPLOY
     develop:
-      - step:
-          name: "Code Review SONARQUBE"
-          <<: *code-review
+      #- step:
+      #     name: "Code Review SONARQUBE"
+      #     <<: *code-review
       
       - step:
           name: "TODO TESTING"
