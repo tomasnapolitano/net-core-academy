@@ -1,5 +1,6 @@
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
@@ -39,14 +40,40 @@ namespace Repositories
             if (!_passwordHasher.Verify(searchedUser.Password, userLoginDTO.Password))
                 throw new BadRequestException("La contraseña ingresada no es correcta.");
 
-            // crear una custom exception para error de login?
+            /*if (searchedUser.Active == false)
+                throw new BadRequestException("Este usuario no se encuentra Activo.");*/
 
             return _mapper.Map<UserWithTokenDTO>(searchedUser);
         }
 
+        public async Task<bool> ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO)
+        {
+            User searchedUser = await _context.Users.Where(u =>
+                                                 u.Email == userUpdatePassDTO.Email)
+                                             .FirstOrDefaultAsync();
+
+            if (searchedUser == null)
+                throw new KeyNotFoundException("El email ingresado no tiene una cuenta asociada. Por favor comuníquese con su Agente asignado para dar de alta su cuenta.");
+
+            if (!_passwordHasher.Verify(searchedUser.Password, userUpdatePassDTO.OldPassword))
+                throw new BadRequestException("La contraseña ingresada no es correcta.");
+
+            List<string> passwordErrors = VerifyPassword(userUpdatePassDTO.OldPassword, userUpdatePassDTO.NewPassword);
+            if (passwordErrors.Any())
+            {
+                throw new BadRequestException("La contraseña ingresada no cumple los requisitos: " + string.Join(" ", passwordErrors));
+            }
+
+            // le cambiamos la contraseña, primero haciendole un Hash
+            searchedUser.Password = _passwordHasher.Hash(userUpdatePassDTO.NewPassword);
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
         public async Task<List<UserDTO>> GetUsers()
         {
-            var users = await _context.Users.Include(u => u.Address)
+            List<User> users = await _context.Users.Include(u => u.Address)
                                             .ThenInclude(a => a.Location)
                                             .ThenInclude(l => l.District)
                                             .ToListAsync();
@@ -61,7 +88,7 @@ namespace Repositories
 
         public async Task<List<UserDTO>> GetActiveUsers()
         {
-            var users = await _context.Users.Where(x => x.Active == true)
+            List<User> users = await _context.Users.Where(x => x.Active == true)
                                             .Include(u => u.Address)
                                             .ThenInclude(a => a.Location)
                                             .ThenInclude(l => l.District)
@@ -98,6 +125,11 @@ namespace Repositories
             if(user == null)
             {
                 throw new KeyNotFoundException($"No se encontró el usuario con rol id igual a :{id}");
+            }
+
+            if(user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
             }
 
             return user.RoleId;
@@ -160,6 +192,11 @@ namespace Repositories
                 throw new BadRequestException("El usuario no posee rol de agente.");
             }
 
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             return _mapper.Map<AgentDTO>(user);
         }
 
@@ -181,6 +218,10 @@ namespace Repositories
             if (user.Address.Location.District == null)
             {
                 throw new KeyNotFoundException("El usuario no tiene distrito asignado.");
+            }
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
             }
 
             var service = await _context.Services.FindAsync(serviceId);
@@ -318,6 +359,11 @@ namespace Repositories
             if (user == null)
                 throw new KeyNotFoundException("No se encontró el usuario.");
 
+            if (user.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             var userWithServicesDTO = _mapper.Map<UserWithServicesDTO>(user);
             var subscriptionQueryResult = await _context.ServiceSubscriptions
                                                         .Include(s => s.DistrictXservice)
@@ -369,6 +415,168 @@ namespace Repositories
             subscription.User = await GetUserById(subscription.User.UserId);
 
             return _mapper.Map<ServiceSubscriptionWithUserDTO>(subscription);
+        }
+
+        public async Task<ConsumptionDTO> GetRandomSubscriptionConsumption(int subscriptionId)
+        {
+            ServiceSubscriptionWithUserDTO subscription = await GetSubscription(subscriptionId);
+
+            if (subscription.PauseSubscription)
+                throw new UnavailableServiceException("La suscripción está pausada actualmente.");
+
+            if (!subscription.DistrictXservice.Active)
+                throw new UnavailableServiceException("El servicio no se encuentra disponible para este distrito actualmente.");
+
+            if (!subscription.Service.Active)
+                throw new UnavailableServiceException("El servicio no se encuentra disponible en este momento.");
+
+            // Se calcula la cantidad de días a cobrar:
+            DateTime firstDayCurrentMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            DateTime firstDate = subscription.StartDate < firstDayCurrentMonth ? firstDayCurrentMonth : subscription.StartDate;
+            TimeSpan daysOfConsumptionSpan = DateTime.Today - firstDate;
+            int daysOfConsumption = (int)daysOfConsumptionSpan.TotalDays;
+
+            // Se genera un número random de consumo (igual para todos los días):
+            Random random = new Random();
+            float dailyConsumption = (float)(random.NextDouble() * 10);
+
+            // Calculo el costo total de consumo:
+            float totalConsumption = daysOfConsumption * dailyConsumption;
+
+            ConsumptionDTO consumptionDTO = new ConsumptionDTO()
+            {
+                DaysOfConsumption = daysOfConsumption,
+                UnitsConsumed = totalConsumption,
+                TotalCost = (float)(totalConsumption * subscription.Service.PricePerUnit),
+                ServiceSubscription = subscription
+            };
+
+            return consumptionDTO;
+        }
+
+        public async Task<ConsumptionBillDTO> GenerateBill(int userId)
+        {
+            UserWithServicesDTO user = await GetUserWithServicesById(userId);
+
+            if (user == null)
+            {
+                throw new KeyNotFoundException("No se encontró el usuario.");
+            }
+
+            if (user.ServiceSubscriptions == null || !user.ServiceSubscriptions.Any())
+            {
+                throw new KeyNotFoundException("El usuario no está subscrito a ningún servicio.");
+            }
+
+            DateTime today = DateTime.Today;
+            ConsumptionBill existingConsumptionBill = await _context.ConsumptionBills
+                                                                    .FirstOrDefaultAsync(cb => cb.UserId == userId &&
+                                                                                                cb.BillDate.Year == today.Year &&
+                                                                                                cb.BillDate.Month == today.Month);
+
+            if (existingConsumptionBill != null)
+            {
+                throw new BadRequestException("Ya existe una factura creada este mes para este usuario.");
+            }
+
+            List<BillDetailDTO> billDetails = new List<BillDetailDTO>();
+
+            // Sumar para obtener el Total
+            double total = 0;
+
+            ConsumptionBill consumptionBill = new ConsumptionBill
+            {
+                UserId = userId,
+                BillStatusId = 2, // El estado inicial de la factura es id = 2 'Pendiente'
+                BillDate = DateTime.Now,
+                Total = 0
+            };
+
+            foreach (var subscription in user.ServiceSubscriptions)
+            {
+                if (subscription.PauseSubscription)
+                    continue;
+
+                // Obtenemos la consumición del servicio al que está suscripto el cliente
+                ConsumptionDTO consumptionSubscription = await GetRandomSubscriptionConsumption(subscription.SubscriptionId);
+
+                var newBillDetail = new BillDetailDTO
+                {
+                    SubscriptionId = subscription.SubscriptionId,
+                    ConsumptionBillId = 0, // Como aún no se ha creado la factura completa, mantenemos el valor en cero
+                    UnitsConsumed = consumptionSubscription.UnitsConsumed,
+                    DaysBilled = consumptionSubscription.DaysOfConsumption,
+                    PricePerUnit = subscription.Service.PricePerUnit
+                };
+
+                total += consumptionSubscription.UnitsConsumed * subscription.Service.PricePerUnit;
+                billDetails.Add(newBillDetail);
+            }
+
+            // Calcular el total de la factura sumando los detalles de la factura
+            consumptionBill.Total = total;
+
+            _context.ConsumptionBills.Add(consumptionBill);
+            await _context.SaveChangesAsync();
+
+            foreach (var billDetail in billDetails)
+            {
+                billDetail.ConsumptionBillId = consumptionBill.ConsumptionBillId;
+            }
+
+            // Antes de guardar los detalles de la factura en la base de datos
+            var billDetailEntities = billDetails.Select(bd => _mapper.Map<BillDetail>(bd)).ToList();
+
+            _context.BillDetails.AddRange(billDetailEntities);
+            await _context.SaveChangesAsync();
+
+            ConsumptionBillDTO billToReturn = _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+            billToReturn.User = _mapper.Map<UserDTO>(user);
+            billToReturn.BillDetails = billDetails;
+
+            return billToReturn;
+        }
+
+        public async Task<ConsumptionBillDTO> GetBillById(int billId)
+        {
+            ConsumptionBill consumptionBill = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .FirstOrDefaultAsync(cb => cb.ConsumptionBillId == billId);
+            
+            if (consumptionBill == null)
+            {
+                throw new KeyNotFoundException("No se pudo encontrar la factura.");
+            }
+
+            return _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+        }
+
+        public async Task<List<ConsumptionBillDTO>> GetAllBills()
+        {
+            List<ConsumptionBill> allBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .ToListAsync();
+
+            return _mapper.Map<List<ConsumptionBillDTO>>(allBills);
+        }
+
+        public async Task<List<ConsumptionBillDTO>> GetBillsByUserId(int userId)
+        {
+            List<ConsumptionBill> userBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .Include(cb => cb.User)
+                                                                    .ThenInclude(u => u.Address)
+                                                                    .ThenInclude(a => a.Location)
+                                                                    .ThenInclude(l => l.District)
+                                                                    .Where(cb => cb.UserId == userId)
+                                                                    .ToListAsync();
+
+            return _mapper.Map<List<ConsumptionBillDTO>>(userBills);
         }
 
         public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
@@ -451,6 +659,11 @@ namespace Repositories
                 throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
             }
 
+            if (existingUser.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             existingUser.FirstName = userUpdateDTO.FirstName;
             existingUser.LastName = userUpdateDTO.LastName;
             existingUser.Email = userUpdateDTO.Email;
@@ -477,6 +690,11 @@ namespace Repositories
                 throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
             }
 
+            if (existingUser.Active == false)
+            {
+                throw new BadRequestException("Este usuario no se encuentra Activo.");
+            }
+
             existingUser.Active = false;
             await _context.SaveChangesAsync();
 
@@ -495,6 +713,61 @@ namespace Repositories
         {
             return await _context.UserRoles.AnyAsync(x => x.RoleId == role);
         }
+        private List<string> VerifyPassword(string oldpass, string newpass)
+        {
+            List<string> errors = new List<string>();
+
+            // Verificar que la nueva contraseña y la vieja no sean iguales
+            if (oldpass == newpass)
+                errors.Add("La nueva contraseña no puede ser igual a la contraseña anterior.");
+
+            // Verificar longitud de la nueva contraseña (entre 8 y 16 caracteres)
+            if (newpass.Length < 8 || newpass.Length > 16)
+                errors.Add("La contraseña debe tener entre 8 y 16 caracteres.");
+
+            // Verificar si la nueva contraseña contiene caracteres alfanuméricos
+            bool hasAlphanumeric = false;
+            foreach (char c in newpass)
+            {
+                if (char.IsLetterOrDigit(c))
+                {
+                    hasAlphanumeric = true;
+                    break;
+                }
+            }
+            if (!hasAlphanumeric)
+                errors.Add("La contraseña debe contener al menos un carácter alfanumérico.");
+
+            // Verificar si la nueva contraseña contiene al menos un carácter en mayúscula y uno en minúscula
+            bool hasUpperCase = false;
+            bool hasLowerCase = false;
+            foreach (char c in newpass)
+            {
+                if (char.IsUpper(c))
+                    hasUpperCase = true;
+                if (char.IsLower(c))
+                    hasLowerCase = true;
+            }
+            if (!hasUpperCase || !hasLowerCase)
+                errors.Add("La contraseña debe contener al menos una letra mayúscula y una minúscula.");
+
+            // Verificar si la nueva contraseña contiene al menos un carácter especial
+            string specialCharacters = @"!@#$%^&*()-_+=[]{}|;:'<>,.?/";
+            bool hasSpecialCharacter = false;
+            foreach (char c in newpass)
+            {
+                if (specialCharacters.Contains(c))
+                {
+                    hasSpecialCharacter = true;
+                    break;
+                }
+            }
+            if (!hasSpecialCharacter)
+                errors.Add("La contraseña debe contener al menos un carácter especial.");
+
+            return errors;
+        }
+
         private string[] GetRolesFromToken(string token)
         {
             var handler = new JwtSecurityTokenHandler();

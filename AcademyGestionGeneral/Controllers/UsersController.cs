@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
+using Services;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -23,7 +25,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <summary>
         /// Login a la plataforma
         /// </summary>
-        /// <returns>Bool</returns>
+        /// <returns>UserWithTokenDTO</returns>
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
@@ -32,6 +34,21 @@ namespace AcademyGestionGeneral.Controllers
         public UserWithTokenDTO Login(UserLoginDTO userLoginDTO)
         {
             return _usersService.Login(userLoginDTO);
+        }
+
+        // PUT: api/Users/password
+        /// <summary>
+        /// Cambio de contraseña del usuario
+        /// </summary>
+        /// <param name="userUpdatePassDTO"></param>
+        /// <returns>Bool</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("password")]
+        public bool ChangePassword(UserUpdatePasswordDTO userUpdatePassDTO)
+        {
+            return _usersService.ChangePassword(userUpdatePassDTO);
         }
 
         // GET: api/Users
@@ -165,14 +182,76 @@ namespace AcademyGestionGeneral.Controllers
 
         // GET: api/Users/subscription/1
         /// <summary>
+        ///  Obtiene la subscripción al servicio de un usuario.
+        /// </summary>
+        /// <param name="subscriptionId"></param>
+        /// <returns>ServiceSubscriptionWithUserDTO</returns> 
+        [HttpGet("subscription/{subscriptionId}")]
+        public ServiceSubscriptionWithUserDTO GetServiceSubscriptionClient(int subscriptionId)
+        {
+            return _usersService.GetServiceSubscriptionClient(subscriptionId);
+        }
+
+        // GET: api/Users/subscription/1/consumption
+        /// <summary>
         ///  Obtiene la consumisión de un usuario sobre un servicio al que está suscrito.
         /// </summary>
         /// <param name="subscriptionId"></param>
         /// <returns>ConsumptionDTO</returns> 
-        [HttpGet("subscription/{subscriptionId}")]
+        [HttpGet("subscription/{subscriptionId}/consumption")]
         public ConsumptionDTO GetSubscriptionConsumption(int subscriptionId)
         {
             return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
+        }
+
+        // POST: api/Users/bill/{userId}/generate
+        /// <summary>
+        /// Genera las facturas del cliente elegido
+        /// </summary>
+        /// <param name="userId">ID del usuario</param>
+        /// <returns>BillDetailDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost("bill/{userId}/generate")]
+        public ConsumptionBillDTO GenerateBill(int userId)
+        {
+            return _usersService.GenerateBill(userId);
+        } // ------ api/Users/{userId}/bills/generate -----------------------------
+
+        // GET: api/Users/bills/1
+        /// <summary>
+        ///  Obtiene la los datos de una factura por Id.
+        /// </summary>
+        /// <param name="billId"></param>
+        /// <returns>ConsumptionDTO</returns> 
+        [HttpGet("bills/{billId}")]
+        public ConsumptionBillDTO GetBillById(int billId)
+        {
+            return _usersService.GetBillById(billId);
+        }
+
+        // GET: api/Users/1/bills
+        /// <summary>
+        ///  Obtiene todas las facturas de un usuario por id.
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <returns>List<ConsumptionDTO></returns> 
+        [HttpGet("{userId}/bills")]
+        public List<ConsumptionBillDTO> GetBillsByUserId(int userId)
+        {
+            return _usersService.GetBillsByUserId(userId);
+        }
+
+        // GET: api/Users/bills
+        /// <summary>
+        ///  Obtiene todas las facturas.
+        /// </summary>
+        /// <returns>List<ConsumptionBillDTO></returns> 
+        [HttpGet("bills")]
+        public List<ConsumptionBillDTO> GetAllBills()
+        {
+            return _usersService.GetAllBills();
         }
 
         // GET: api/Users/consumptionBill/1/pdf

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Models.DTOs.Bill;
 using Models.DTOs.District;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
@@ -17,6 +18,7 @@ namespace Repositories.Utils
             CreateMap<User, UserWithTokenDTO>();
 
             CreateMap<User, UserWithServicesDTO>().ForMember(u => u.ServiceSubscriptions, opt => opt.Ignore());
+            CreateMap<UserWithServicesDTO, UserDTO>();
 
             CreateMap<AgentDTO, User>();
             CreateMap<User, AgentDTO>();
@@ -49,6 +51,12 @@ namespace Repositories.Utils
 
             CreateMap<ServiceType, ServiceTypeDTO>();
             CreateMap<ServiceTypeDTO, ServiceType>();
+
+            CreateMap<BillDetail, BillDetailDTO>();
+            CreateMap<BillDetailDTO, BillDetail>();
+
+            CreateMap<ConsumptionBill, ConsumptionBillDTO>();
+            CreateMap<ConsumptionBillDTO, ConsumptionBill>();
         }
     }
 }
