@@ -218,6 +218,23 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GenerateBill(userId);
         } // ------ api/Users/{userId}/bills/generate -----------------------------
 
+        // PATCH: api/Users/bills/{userId}
+        /// <summary>
+        /// Actualiza el estado de una factura
+        /// </summary>
+        /// <param name="billId">ID de la factura</param>
+        /// <param name="statusId">ID del estado de factura</param>
+        /// <returns>ConsumptionBillDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPatch("bills/{billId}")]
+        public ConsumptionBillDTO UpdateBillStatus(int billId, [FromBody] int statusId)
+        {
+            return _usersService.UpdateBillStatus(billId, statusId);
+        }
+
+
         // GET: api/Users/bills/1
         /// <summary>
         ///  Obtiene la los datos de una factura por Id.

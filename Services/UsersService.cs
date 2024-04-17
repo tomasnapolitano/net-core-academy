@@ -102,6 +102,11 @@ namespace Services
             return _usersRepository.GenerateBill(userId).Result;
         }
 
+        public ConsumptionBillDTO UpdateBillStatus(int billId, int statusId)
+        {
+            return _usersRepository.UpdateBillStatus(billId, statusId).Result;
+        }
+
         public ConsumptionBillDTO GetBillById(int billId)
         {
             return _usersRepository.GetBillById(billId).Result;

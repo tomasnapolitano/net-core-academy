@@ -538,6 +538,24 @@ namespace Repositories
             return billToReturn;
         }
 
+        public async Task<ConsumptionBillDTO> UpdateBillStatus(int billId, int statusId)
+        {
+            ConsumptionBill bill = await _context.ConsumptionBills.FindAsync(billId);
+
+            if (bill == null)
+                throw new KeyNotFoundException($"La factura de Id: {billId} no existe.");
+
+            BillStatus billStatus = await _context.BillStatuses.FindAsync(statusId);
+
+            if (billStatus == null)
+                throw new KeyNotFoundException($"El estado de Id: {statusId} no existe.");
+
+            bill.BillStatusId = statusId;
+            await _context.SaveChangesAsync();
+
+            return await GetBillById(billId);
+        }
+
         public async Task<ConsumptionBillDTO> GetBillById(int billId)
         {
             ConsumptionBill consumptionBill = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
