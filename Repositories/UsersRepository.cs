@@ -823,8 +823,10 @@ namespace Repositories
         public async Task<List<UserDTO>> GetUsersWithoutBillReport()
         {
             var usersWithoutConsumption = await _context.Users
-                .Where(u => !u.ConsumptionBills.Any())
-                .ToListAsync();
+                                                .Include(u => u.Address)
+                                                .Where(u => !u.ConsumptionBills.Any())
+                                                .ToListAsync();
+
 
             if (usersWithoutConsumption == null)
             {
