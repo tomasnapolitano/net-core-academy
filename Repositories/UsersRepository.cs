@@ -797,16 +797,25 @@ namespace Repositories
             // Primero, traemos los usuarios con sus direcciones de manera asincrónica
             var usersWithAddresses = await _context.Users
                 .Include(u => u.Address)
+                    .ThenInclude(a => a.Location)
                 .ToListAsync();
 
-            // Luego, agrupamos los usuarios válidos por DistrictId
-            var groupedUsers = usersWithAddresses
-                .GroupBy(u => u.Address.Location.DistrictId)
+            // Filtramos los usuarios que tienen una dirección y una ubicación asociada en memoria
+            var usersWithValidLocations = usersWithAddresses
+                .Where(u => u.Address != null && u.Address.Location != null)
+                .ToList();
+
+            // Luego, agrupamos los usuarios válidos por LocationId en memoria
+            var groupedUsers = usersWithValidLocations
+                .GroupBy(u => u.Address.Location.LocationId) // Agrupamos por LocationId en lugar de DistrictId
                 .ToList();
 
             // Finalmente, convertimos el resultado agrupado en un diccionario
             var usersCountByDistrict = groupedUsers
-                .ToDictionary(g => g.Key ?? -1, g => g.Count());
+                .ToDictionary(
+                    g => g.Key != null ? g.Key : -1, // Si la clave es null, usamos -1 como clave en lugar de null
+                    g => g.Count()
+                );
 
             return usersCountByDistrict;
         }
