@@ -809,5 +809,70 @@ namespace Repositories
 
             return roles ?? new string[0];
         }
+
+        public async Task<Dictionary<int, int>> GetUsersCountByDistrict()
+        {
+            var usersWithAddresses = await _context.Users
+                .Include(u => u.Address)
+                    .ThenInclude(a => a.Location)
+                .ToListAsync();
+
+            var usersWithValidLocations = usersWithAddresses
+                .Where(u => u.Address != null && u.Address.Location != null)
+                .ToList();
+
+            var groupedUsers = usersWithValidLocations
+                .GroupBy(u => u.Address.Location.LocationId)
+                .ToList();
+
+            var usersCountByDistrict = groupedUsers
+                .ToDictionary(
+                    g => g.Key != null ? g.Key : -1, // Si la clave es null, usamos -1 como clave en lugar de null
+                    g => g.Count()
+                );
+
+            if(usersCountByDistrict == null)
+            {
+                throw new KeyNotFoundException("No se encontraron usuarios en los distritos.");
+            }
+
+            return usersCountByDistrict;
+        }
+        public async Task<List<UserDTO>> GetUsersWithoutBillReport()
+        {
+            var usersWithoutConsumption = await _context.Users
+                                                .Include(u => u.Address)
+                                                .Where(u => !u.ConsumptionBills.Any())
+                                                .ToListAsync();
+
+
+            if (usersWithoutConsumption == null)
+            {
+                throw new KeyNotFoundException("No se encontraron usuarios sin consumos.");
+            }
+
+            return _mapper.Map<List<UserDTO>>(usersWithoutConsumption); ;
+        }
+
+        public async Task<Dictionary<string, int>> GetUsersByRoleReport()
+        {
+            var report = new Dictionary<string, int>();
+
+            var roleCounts = await _context.Users
+                .GroupBy(u => u.Role.RoleName)
+                .Select(g => new
+                {
+                    RoleName = g.Key,
+                    UserCount = g.Count()
+                })
+                .ToListAsync();
+
+            foreach (var roleCount in roleCounts)
+            {
+                report.Add(roleCount.RoleName, roleCount.UserCount);
+            }
+
+            return report;
+        }
     }
 }

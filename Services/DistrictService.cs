@@ -57,5 +57,10 @@ namespace Services
         {
             return _districtRepository.DeactivateServiceByDistrict(districtId, serviceId).Result;
         }
+
+        public Dictionary<string, Dictionary<string, int>> GetServicesByDistrictReport()
+        {
+            return _districtRepository.GetServicesByDistrictReport().Result;
+        }
     }
 }

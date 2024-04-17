@@ -152,5 +152,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _districtService.DeactivateServiceByDistrict(districtId, serviceId);
         }
+
+        // GET: api/District/reports/servicesByDistrict
+        /// <summary>
+        /// Servicios disponibles junto a cantidad de usuarios suscriptos en ese distrito
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/servicesByDistrict")]
+        public Dictionary<string, Dictionary<string, int>> GetServicesByDistrictReport()
+        {
+            return _districtService.GetServicesByDistrictReport();
+        }
     }
 }

@@ -178,5 +178,20 @@ namespace Services
 
             return tokenHandler.WriteToken(token);
         }
+
+        public Dictionary<int, int> GetUsersCountByDistrict()
+        {
+            return _usersRepository.GetUsersCountByDistrict().Result;
+        }
+
+        public List<UserDTO> GetUsersWithoutBillReport()
+        {
+            return _usersRepository.GetUsersWithoutBillReport().Result;
+        }
+
+        public Dictionary<string, int> GetUsersByRoleReport()
+        {
+            return _usersRepository.GetUsersByRoleReport().Result;
+        }
     }
 }

@@ -336,5 +336,47 @@ namespace AcademyGestionGeneral.Controllers
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             return _usersService.DeleteUser(id, token);
         }
+
+        // GET: api/Users/reports/countByDistrict
+        /// <summary>
+        /// Obtiene la cantidad de usuarios por distritos
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/countByDistrict")]
+        public Dictionary<int, int> GetUsersCountByDistrict()
+        {
+            return _usersService.GetUsersCountByDistrict();
+        }
+
+        // GET: api/Users/reports/usersWithoutBill
+        /// <summary>
+        /// Obtiene a los usuarios sin facturas
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/usersWithoutBill")]
+        public List<UserDTO> GetUsersWithoutBillReport()
+        {
+            return _usersService.GetUsersWithoutBillReport();
+        }
+
+        // GET: api/Users/reports/usersByRole
+        /// <summary>
+        /// Obtiene la cantidad de usuarios por roles (admin/agente/cliente)
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/usersByRole")]
+        public Dictionary<string, int> GetUsersByRoleReport()
+        {
+            return _usersService.GetUsersByRoleReport();
+        }
     }
 }

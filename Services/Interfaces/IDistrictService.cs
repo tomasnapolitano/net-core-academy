@@ -13,5 +13,6 @@ namespace Services.Interfaces
         DistrictWithServicesDTO AddServiceToDistrict(int districtId, int serviceId);
         DistrictWithServicesDTO GetDistrictWithServices(int districtId);
         DistrictWithServicesDTO DeactivateServiceByDistrict(int districtId, int serviceId);
+        Dictionary<string, Dictionary<string, int>> GetServicesByDistrictReport();
     }
 }
