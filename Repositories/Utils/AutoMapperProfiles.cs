@@ -27,7 +27,7 @@ namespace Repositories.Utils
             CreateMap<User, UserUpdateDTO>();
 
             CreateMap<ServiceSubscription,ServiceSubscriptionWithUserDTO>();
-            CreateMap<ServiceSubscription,ServiceSubscriptionDTO>();
+            CreateMap<ServiceSubscription,ServiceSubscriptionDTO>().ForMember(dest => dest.Service, opt => opt.MapFrom(src => src.DistrictXservice.Service));
 
             CreateMap<Address,AddressDTO>();
             CreateMap<Location,LocationDTO>();

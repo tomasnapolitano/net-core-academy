@@ -1,16 +1,17 @@
 using Microsoft.IdentityModel.Tokens;
+using Models.DTOs;
 using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
+using QuestPDF.Fluent;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Utils.CustomValidator;
-using Utils.Middleware;
 
 namespace Services
 {
@@ -114,6 +115,16 @@ namespace Services
         public List<ConsumptionBillDTO> GetAllBills()
         {
             return _usersRepository.GetAllBills().Result;
+        }
+
+        public Stream GetBillPdf(int billId)
+        {
+            ConsumptionBillDTO billDTO = _usersRepository.GetBillById(billId).Result;
+            ConsumptionBillPdf billPdf = new ConsumptionBillPdf(billDTO);
+            byte[] pdfByteArray = billPdf.GeneratePdf();
+            MemoryStream pdfStream = new MemoryStream(pdfByteArray);
+
+            return pdfStream;
         }
 
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)

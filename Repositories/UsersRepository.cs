@@ -9,7 +9,6 @@ using Repositories.Interfaces;
 using Repositories.Utils.PasswordHasher;
 using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using Utils.Enum;
 using Utils.Middleware;
 
@@ -328,7 +327,8 @@ namespace Repositories
                         ServiceId = subscription.DistrictXservice.Service.ServiceId,
                         ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
                         ServiceName = subscription.DistrictXservice.Service.ServiceName,
-                        PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                        PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit,
+                        Active = subscription.DistrictXservice.Service.Active,
                     };
 
                     ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
@@ -380,7 +380,8 @@ namespace Repositories
                     ServiceId = subscription.DistrictXservice.Service.ServiceId,
                     ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
                     ServiceName = subscription.DistrictXservice.Service.ServiceName,
-                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit,
+                    Active = subscription.DistrictXservice.Service.Active,
                 };
 
                 ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
@@ -502,7 +503,7 @@ namespace Repositories
 
                 var newBillDetail = new BillDetailDTO
                 {
-                    SubscriptionId = subscription.SubscriptionId,
+                    Subscription = subscription,
                     ConsumptionBillId = 0, // Como aún no se ha creado la factura completa, mantenemos el valor en cero
                     UnitsConsumed = consumptionSubscription.UnitsConsumed,
                     DaysBilled = consumptionSubscription.DaysOfConsumption,
@@ -540,6 +541,9 @@ namespace Repositories
         public async Task<ConsumptionBillDTO> GetBillById(int billId)
         {
             ConsumptionBill consumptionBill = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .ThenInclude(bd => bd.Subscription)
+                                                                    .ThenInclude(sub => sub.DistrictXservice)
+                                                                    .ThenInclude(dxs => dxs.Service)
                                                                     .Include(cb => cb.User)
                                                                     .ThenInclude(u => u.Address)
                                                                     .ThenInclude(a => a.Location)
@@ -551,7 +555,9 @@ namespace Repositories
                 throw new KeyNotFoundException("No se pudo encontrar la factura.");
             }
 
-            return _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+            ConsumptionBillDTO result = _mapper.Map<ConsumptionBillDTO>(consumptionBill);
+
+            return result;
         }
 
         public async Task<List<ConsumptionBillDTO>> GetAllBills()
