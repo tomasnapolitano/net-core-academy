@@ -7,7 +7,7 @@ definitions:
   code-build: &code-build
       script:
         - dotnet restore
-        - dotnet publish --no-restore --no-self-contained --configuration Release --output ../publish
+        - dotnet publish --no-restore --no-self-contained --configuration Release --output publish
       artifacts:
         - publish/**
   application-publish: &application-publish
