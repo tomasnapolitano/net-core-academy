@@ -57,6 +57,8 @@ namespace Repositories.Utils
 
             CreateMap<ConsumptionBill, ConsumptionBillDTO>();
             CreateMap<ConsumptionBillDTO, ConsumptionBill>();
+
+            CreateMap<BillStatus, BillStatusDTO>();
         }
     }
 }
