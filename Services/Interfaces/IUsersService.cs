@@ -22,6 +22,7 @@ namespace Services.Interfaces
         ServiceSubscriptionWithUserDTO GetServiceSubscriptionClient(int subscriptionId);
         ConsumptionDTO GetRandomSubscriptionConsumption(int subscriptionId);
         ConsumptionBillDTO GenerateBill(int userId);
+        ConsumptionBillDTO UpdateBillStatus(int billId, int statusId);
         ConsumptionBillDTO GetBillById(int billId);
         List<ConsumptionBillDTO> GetBillsByUserId(int userId);
         List<ConsumptionBillDTO> GetAllBills();
