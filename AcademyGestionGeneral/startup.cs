@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Middlewares;
 using Models.Entities;
+using QuestPDF.Infrastructure;
 using Repositories;
 using Repositories.Interfaces;
 using Repositories.Utils;
@@ -143,6 +144,9 @@ namespace AcademyGestionGeneral
                     c.DocExpansion(DocExpansion.None); // Opcional: Configura la expansión de la documentación
                 });
             }
+
+            // Configurando licencia de QuestPDF:
+            QuestPDF.Settings.License = LicenseType.Community;
 
             app.UseCors("Policy");
 
