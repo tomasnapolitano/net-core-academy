@@ -308,5 +308,19 @@ namespace AcademyGestionGeneral.Controllers
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             return _usersService.DeleteUser(id, token);
         }
+
+        // GET: api/Users/reports/countByDistrict
+        /// <summary>
+        /// Obtiene la cantidad de usuarios por distritos
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/countByDistrict")]
+        public Dictionary<int, int> GetUsersCountByDistrict()
+        {
+            return _usersService.GetUsersCountByDistrict();
+        }
     }
 }

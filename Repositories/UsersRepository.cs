@@ -785,5 +785,24 @@ namespace Repositories
 
             return roles ?? new string[0];
         }
+
+        public async Task<Dictionary<int, int>> GetUsersCountByDistrict()
+        {
+            // Primero, traemos los usuarios con sus direcciones de manera asincrónica
+            var usersWithAddresses = await _context.Users
+                .Include(u => u.Address)
+                .ToListAsync();
+
+            // Luego, agrupamos los usuarios válidos por DistrictId
+            var groupedUsers = usersWithAddresses
+                .GroupBy(u => u.Address.Location.DistrictId)
+                .ToList();
+
+            // Finalmente, convertimos el resultado agrupado en un diccionario
+            var usersCountByDistrict = groupedUsers
+                .ToDictionary(g => g.Key ?? -1, g => g.Count());
+
+            return usersCountByDistrict;
+        }
     }
 }
