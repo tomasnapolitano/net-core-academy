@@ -141,7 +141,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <summary>
         /// Obtiene un listado de usuarios con sus servicios suscritos
         /// </summary>
-        /// <returns>List<UserWithServicesDTO>()</returns>
+        /// <returns>UserWithServicesDTO</returns>
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
@@ -208,7 +208,7 @@ namespace AcademyGestionGeneral.Controllers
         /// Genera las facturas del cliente elegido
         /// </summary>
         /// <param name="userId">ID del usuario</param>
-        /// <returns>BillDetailDTO</returns>
+        /// <returns>ConsumptionBillDTO</returns>
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
@@ -252,7 +252,7 @@ namespace AcademyGestionGeneral.Controllers
         ///  Obtiene todas las facturas de un usuario por id.
         /// </summary>
         /// <param name="userId"></param>
-        /// <returns>List<ConsumptionDTO></returns> 
+        /// <returns>ConsumptionDTO</returns> 
         [HttpGet("{userId}/bills")]
         public List<ConsumptionBillDTO> GetBillsByUserId(int userId)
         {
@@ -263,7 +263,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <summary>
         ///  Obtiene todas las facturas.
         /// </summary>
-        /// <returns>List<ConsumptionBillDTO></returns> 
+        /// <returns>ConsumptionBillDTO</returns> 
         [HttpGet("bills")]
         public List<ConsumptionBillDTO> GetAllBills()
         {
