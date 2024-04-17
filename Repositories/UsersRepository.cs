@@ -566,6 +566,7 @@ namespace Repositories
                                                                     .ThenInclude(u => u.Address)
                                                                     .ThenInclude(a => a.Location)
                                                                     .ThenInclude(l => l.District)
+                                                                    .Include(cb => cb.BillStatus)
                                                                     .FirstOrDefaultAsync(cb => cb.ConsumptionBillId == billId);
             
             if (consumptionBill == null)
@@ -581,10 +582,14 @@ namespace Repositories
         public async Task<List<ConsumptionBillDTO>> GetAllBills()
         {
             List<ConsumptionBill> allBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .ThenInclude(bd => bd.Subscription)
+                                                                    .ThenInclude(sub => sub.DistrictXservice)
+                                                                    .ThenInclude(dxs => dxs.Service)
                                                                     .Include(cb => cb.User)
                                                                     .ThenInclude(u => u.Address)
                                                                     .ThenInclude(a => a.Location)
                                                                     .ThenInclude(l => l.District)
+                                                                    .Include(cb => cb.BillStatus)
                                                                     .ToListAsync();
 
             return _mapper.Map<List<ConsumptionBillDTO>>(allBills);
@@ -593,10 +598,14 @@ namespace Repositories
         public async Task<List<ConsumptionBillDTO>> GetBillsByUserId(int userId)
         {
             List<ConsumptionBill> userBills = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
+                                                                    .ThenInclude(bd => bd.Subscription)
+                                                                    .ThenInclude(sub => sub.DistrictXservice)
+                                                                    .ThenInclude(dxs => dxs.Service)
                                                                     .Include(cb => cb.User)
                                                                     .ThenInclude(u => u.Address)
                                                                     .ThenInclude(a => a.Location)
                                                                     .ThenInclude(l => l.District)
+                                                                    .Include(cb => cb.BillStatus)
                                                                     .Where(cb => cb.UserId == userId)
                                                                     .ToListAsync();
 
