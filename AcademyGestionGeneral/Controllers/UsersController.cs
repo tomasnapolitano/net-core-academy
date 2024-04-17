@@ -348,7 +348,7 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetUsersWithoutBillReport();
         }
 
-        // GET: api/Users/reports/usersByRol
+        // GET: api/Users/reports/usersByRole
         /// <summary>
         /// Obtiene la cantidad de usuarios por roles (admin/agente/cliente)
         /// </summary>
@@ -356,7 +356,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="200">La operación fue exitosa</response>
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
-        [HttpGet("reports/usersByRol")]
+        [HttpGet("reports/usersByRole")]
         public Dictionary<string, int> GetUsersByRoleReport()
         {
             return _usersService.GetUsersByRoleReport();
