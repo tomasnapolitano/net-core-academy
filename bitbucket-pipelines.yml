@@ -51,7 +51,7 @@ definitions:
           enabled: false
         script:
           - source docker-version.txt
-          - export NAMESPACE=academy-dotnet-${echo -n $BITBUCKET_DEPLOYMENT_ENVIRONMENT | sed -e "s/testing/dev/g; s/staging/uat/g"; s/production/prod/g";)
+          - export NAMESPACE=academy-dotnet-$(echo -n $BITBUCKET_DEPLOYMENT_ENVIRONMENT | sed -e "s/testing/dev/g; s/staging/uat/g; s/production/prod/g")
           - curl -sL https://github.com/digitalocean/doctl/releases/download/v1.96.1/doctl-1.96.1-linux-amd64.tar.gz | tar -xzv
           - ./doctl -t $DOCTL_TOKEN k8s cluster kubeconfig show talento-k8s > kubeconfig.yml
           - kubectl --insecure-skip-tls-verify --kubeconfig=kubeconfig.yml set image deployment/$BITBUCKET_ backend=$IMAGE_NAME:$IMAGE_TAG -n $NAMESPACE --record=true
