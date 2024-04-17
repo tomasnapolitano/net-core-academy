@@ -263,5 +263,37 @@ namespace Repositories
                 return await GetDistrictWithServices(districtId);
             }
         }
+
+        public async Task<Dictionary<string, Dictionary<string, int>>> GetServicesByDistrictReport()
+        {
+            var report = new Dictionary<string, Dictionary<string, int>>();
+
+            var districts = await _context.Districts
+                .Include(d => d.DistrictXservices)
+                    .ThenInclude(ds => ds.Service)
+                        .ThenInclude(s => s.DistrictXservices)
+                .ToListAsync();
+
+            foreach (var district in districts)
+            {
+                var districtName = district.DistrictName;
+
+                var serviceCountByDistrict = new Dictionary<string, int>();
+
+                foreach (var districtXService in district.DistrictXservices)
+                {
+                    var serviceName = districtXService.Service.ServiceName;
+
+                    // Contar el número de usuarios suscritos a este servicio en este distrito
+                    var userCount = await _context.ServiceSubscriptions
+                        .Where(sub => sub.DistrictXserviceId == districtXService.DistrictXserviceId)
+                        .CountAsync();
+
+                    serviceCountByDistrict.Add(serviceName, userCount);
+                }
+                report.Add(districtName, serviceCountByDistrict);
+            }
+            return report;
+        }
     }
 }

@@ -15,5 +15,6 @@ namespace Repositories.Interfaces
         Task<DistrictWithServicesDTO> AddServiceToDistrict(int districtId, int serviceId);
         Task<DistrictXservice> PostDistrictXservice(int districtId, int serviceId);
         Task<DistrictWithServicesDTO> DeactivateServiceByDistrict(int districtId, int serviceId);
+        Task<Dictionary<string, Dictionary<string, int>>> GetServicesByDistrictReport();
     }
 }

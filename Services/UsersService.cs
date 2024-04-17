@@ -178,5 +178,15 @@ namespace Services
         {
             return _usersRepository.GetUsersCountByDistrict().Result;
         }
+
+        public List<UserDTO> GetUsersWithoutBillReport()
+        {
+            return _usersRepository.GetUsersWithoutBillReport().Result;
+        }
+
+        public Dictionary<string, int> GetUsersByRoleReport()
+        {
+            return _usersRepository.GetUsersByRoleReport().Result;
+        }
     }
 }

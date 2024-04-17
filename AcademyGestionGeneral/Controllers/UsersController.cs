@@ -333,5 +333,33 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _usersService.GetUsersCountByDistrict();
         }
+
+        // GET: api/Users/reports/usersWithoutBill
+        /// <summary>
+        /// Obtiene a los usuarios sin facturas
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/usersWithoutBill")]
+        public List<UserDTO> GetUsersWithoutBillReport()
+        {
+            return _usersService.GetUsersWithoutBillReport();
+        }
+
+        // GET: api/Users/reports/usersByRol
+        /// <summary>
+        /// Obtiene la cantidad de usuarios por roles (admin/agente/cliente)
+        /// </summary>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("reports/usersByRol")]
+        public Dictionary<string, int> GetUsersByRoleReport()
+        {
+            return _usersService.GetUsersByRoleReport();
+        }
     }
 }

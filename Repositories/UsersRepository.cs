@@ -794,30 +794,65 @@ namespace Repositories
 
         public async Task<Dictionary<int, int>> GetUsersCountByDistrict()
         {
-            // Primero, traemos los usuarios con sus direcciones de manera asincrónica
             var usersWithAddresses = await _context.Users
                 .Include(u => u.Address)
                     .ThenInclude(a => a.Location)
                 .ToListAsync();
 
-            // Filtramos los usuarios que tienen una dirección y una ubicación asociada en memoria
             var usersWithValidLocations = usersWithAddresses
                 .Where(u => u.Address != null && u.Address.Location != null)
                 .ToList();
 
-            // Luego, agrupamos los usuarios válidos por LocationId en memoria
             var groupedUsers = usersWithValidLocations
-                .GroupBy(u => u.Address.Location.LocationId) // Agrupamos por LocationId en lugar de DistrictId
+                .GroupBy(u => u.Address.Location.LocationId)
                 .ToList();
 
-            // Finalmente, convertimos el resultado agrupado en un diccionario
             var usersCountByDistrict = groupedUsers
                 .ToDictionary(
                     g => g.Key != null ? g.Key : -1, // Si la clave es null, usamos -1 como clave en lugar de null
                     g => g.Count()
                 );
 
+            if(usersCountByDistrict == null)
+            {
+                throw new KeyNotFoundException("No se encontraron usuarios en los distritos.");
+            }
+
             return usersCountByDistrict;
+        }
+        public async Task<List<UserDTO>> GetUsersWithoutBillReport()
+        {
+            var usersWithoutConsumption = await _context.Users
+                .Where(u => !u.ConsumptionBills.Any())
+                .ToListAsync();
+
+            if (usersWithoutConsumption == null)
+            {
+                throw new KeyNotFoundException("No se encontraron usuarios sin consumos.");
+            }
+
+            return _mapper.Map<List<UserDTO>>(usersWithoutConsumption); ;
+        }
+
+        public async Task<Dictionary<string, int>> GetUsersByRoleReport()
+        {
+            var report = new Dictionary<string, int>();
+
+            var roleCounts = await _context.Users
+                .GroupBy(u => u.Role.RoleName)
+                .Select(g => new
+                {
+                    RoleName = g.Key,
+                    UserCount = g.Count()
+                })
+                .ToListAsync();
+
+            foreach (var roleCount in roleCounts)
+            {
+                report.Add(roleCount.RoleName, roleCount.UserCount);
+            }
+
+            return report;
         }
     }
 }
