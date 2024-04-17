@@ -4,7 +4,6 @@ using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
-using Services;
 using Services.Interfaces;
 
 namespace AcademyGestionGeneral.Controllers
@@ -252,6 +251,18 @@ namespace AcademyGestionGeneral.Controllers
         public List<ConsumptionBillDTO> GetAllBills()
         {
             return _usersService.GetAllBills();
+        }
+
+        // GET: api/Users/bills/1/pdf
+        /// <summary>
+        ///  Obtiene una factura en formato PDF.
+        /// </summary>
+        /// <param name="billId"></param>
+        /// <returns>ConsumptionBillPdf</returns> 
+        [HttpGet("bills/{billId}/pdf")]
+        public IActionResult GetBillPdf(int billId)
+        {
+            return File(_usersService.GetBillPdf(billId), "application/pdf", "Factura.pdf");
         }
 
         // PUT: api/Users/services/1/pausesubscribe
