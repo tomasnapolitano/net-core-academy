@@ -1,16 +1,17 @@
 using Microsoft.IdentityModel.Tokens;
+using Models.DTOs;
 using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
 using Models.DTOs.User;
 using Models.Entities;
+using QuestPDF.Fluent;
 using Repositories.Interfaces;
 using Services.Interfaces;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Utils.CustomValidator;
-using Utils.Middleware;
 
 namespace Services
 {
@@ -116,17 +117,14 @@ namespace Services
             return _usersRepository.GetAllBills().Result;
         }
 
-        public ConsumptionBillPdf GetConsumptionBillPdf(int consumptionBillId)
+        public Stream GetBillPdf(int billId)
         {
-            //     obtengo la BillDTO (repositorio) 
-            // ConsumptionBillDTO billDTO = _usersRepository.GetConsumptionBill(consumptionBillId);
+            ConsumptionBillDTO billDTO = _usersRepository.GetBillById(billId).Result;
+            ConsumptionBillPdf billPdf = new ConsumptionBillPdf(billDTO);
+            byte[] pdfByteArray = billPdf.GeneratePdf();
+            MemoryStream pdfStream = new MemoryStream(pdfByteArray);
 
-            //     paso el billDTO a método que genere el PDF (service, ya que no contacta a la BD) (GenerateConsumptionBillPdf)
-             var billPdf = new ConsumptionBillPdf(billDTO);
-            //     paso PDF a Stream
-             billPdf.GeneratePdf()
-
-            //     Retorno file/stream
+            return pdfStream;
         }
 
         public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
@@ -174,11 +172,6 @@ namespace Services
             var token = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(token);
-        }
-
-        private ConsumptionBillPdf GenerateConsumptionBillPdf(ConsumptionBillDTO billDTO)
-        {
-
         }
     }
 }
