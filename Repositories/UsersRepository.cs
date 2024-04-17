@@ -327,7 +327,8 @@ namespace Repositories
                         ServiceId = subscription.DistrictXservice.Service.ServiceId,
                         ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
                         ServiceName = subscription.DistrictXservice.Service.ServiceName,
-                        PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                        PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit,
+                        Active = subscription.DistrictXservice.Service.Active,
                     };
 
                     ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
@@ -379,7 +380,8 @@ namespace Repositories
                     ServiceId = subscription.DistrictXservice.Service.ServiceId,
                     ServiceTypeId = subscription.DistrictXservice.Service.ServiceTypeId,
                     ServiceName = subscription.DistrictXservice.Service.ServiceName,
-                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit
+                    PricePerUnit = subscription.DistrictXservice.Service.PricePerUnit,
+                    Active = subscription.DistrictXservice.Service.Active,
                 };
 
                 ServiceSubscriptionDTO serviceSubscriptionDTO = new ServiceSubscriptionDTO()
