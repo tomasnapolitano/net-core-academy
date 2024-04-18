@@ -77,7 +77,7 @@ pipelines:
           <<: *application-publish
       - step:
           name: "Application DEV deployment"
-          deployment: testing
+          deployment: academy-dotnet-training-back
           <<: *deployk8s
           
       - step:
