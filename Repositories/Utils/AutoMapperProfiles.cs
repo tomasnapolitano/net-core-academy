@@ -53,9 +53,7 @@ namespace Repositories.Utils
             CreateMap<ServiceTypeDTO, ServiceType>();
 
             CreateMap<BillDetail, BillDetailDTO>();
-            CreateMap<BillDetailDTO, BillDetail>().ForMember(bd => bd.Subscription, opt => opt.Ignore())
-                                                  .ForMember(dest => dest.SubscriptionId, opt => opt.MapFrom(src => src.Subscription.SubscriptionId));
-                                                  
+            CreateMap<BillDetailDTO, BillDetail>();
 
             CreateMap<ConsumptionBill, ConsumptionBillDTO>();
             CreateMap<ConsumptionBillDTO, ConsumptionBill>();
