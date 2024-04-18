@@ -301,7 +301,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <param name="userCreationDTO"></param>
         /// <returns></returns>
         [HttpPost]
-        public UserDTO PostUser(UserCreationDTO userCreationDTO)
+        public UserCreationResponseDTO PostUser(UserCreationDTO userCreationDTO)
         {
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
             return _usersService.PostUser(userCreationDTO, token);
@@ -377,6 +377,22 @@ namespace AcademyGestionGeneral.Controllers
         public Dictionary<string, int> GetUsersByRoleReport()
         {
             return _usersService.GetUsersByRoleReport();
+        }
+
+        // GET: activate?token=;
+        /// <summary>
+        /// Activa un usuario mediante el Token enviado como parametro
+        /// </summary>
+        /// <param name="token"></param>
+        /// <returns></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("activate")]
+        [AllowAnonymous]
+        public bool ActivateAccount(string token)
+        {
+            return _usersService.ActivateAccount(token);
         }
     }
 }

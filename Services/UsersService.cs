@@ -132,7 +132,7 @@ namespace Services
             return pdfStream;
         }
 
-        public UserDTO PostUser(UserCreationDTO userCreationDTO, string token)
+        public UserCreationResponseDTO PostUser(UserCreationDTO userCreationDTO, string token)
         {
             CustomValidatorInput<UserCreationDTO>.DTOValidator(userCreationDTO);
 
@@ -192,6 +192,11 @@ namespace Services
         public Dictionary<string, int> GetUsersByRoleReport()
         {
             return _usersRepository.GetUsersByRoleReport().Result;
+        }
+
+        public bool ActivateAccount(string token)
+        {
+            return _usersRepository.ActivateAccount(token).Result;
         }
     }
 }

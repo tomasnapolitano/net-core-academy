@@ -22,7 +22,7 @@ namespace Repositories.Interfaces
         Task<UserWithServicesDTO> GetUserWithServicesById(int userId);
         Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId);
         Task<ConsumptionDTO> GetRandomSubscriptionConsumption(int subscriptionId);
-        Task<UserDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
+        Task<UserCreationResponseDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         Task<UserDTO> DeleteUser(int id, string token);
         Task<ConsumptionBillDTO> GenerateBill(int userId);
@@ -33,5 +33,6 @@ namespace Repositories.Interfaces
         Task<Dictionary<int, int>> GetUsersCountByDistrict();
         Task<List<UserDTO>> GetUsersWithoutBillReport();
         Task<Dictionary<string, int>> GetUsersByRoleReport();
+        Task<bool> ActivateAccount(string token);
     }
 }

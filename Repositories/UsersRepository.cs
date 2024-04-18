@@ -1,4 +1,5 @@
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models.DTOs.Bill;
 using Models.DTOs.Login;
@@ -612,7 +613,7 @@ namespace Repositories
             return _mapper.Map<List<ConsumptionBillDTO>>(userBills);
         }
 
-        public async Task<UserDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
+        public async Task<UserCreationResponseDTO> PostUser(UserCreationDTO userCreationDTO , int userRole, string token)
         {
             var rol = GetRolesFromToken(token);
             var clientRoleValue = Convert.ToInt32(UserRoleEnum.Client).ToString();
@@ -671,8 +672,20 @@ namespace Repositories
             await _context.AddAsync(user);
             await _context.SaveChangesAsync();
 
+            // Generar y guardar el token
+            string tokenNewUser = await GenerateTokenNewUserAsync();
+            await SaveTokenNewUserAsync(user, tokenNewUser);
+
+            var activationToken = tokenNewUser;
+
             UserDTO userDTO = await GetUserById(user.UserId);
-            return userDTO;
+            var responseDTO = new UserCreationResponseDTO
+            {
+                User = userDTO,
+                ActivationToken = activationToken
+            };
+
+            return responseDTO;
         }
 
         public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token)
@@ -882,6 +895,56 @@ namespace Repositories
             }
 
             return report;
+        }
+
+        // Token New User
+        public async Task<bool> ActivateAccount(string token)
+        {
+            if (IsTokenValid(token))
+            {
+                var userToken = await _context.UserTokens.FirstOrDefaultAsync(t => t.Token == token);
+
+                if (userToken != null)
+                {
+                    User user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userToken.UserId);
+                    if (user != null)
+                    {
+                        // Confirmar la cuenta del usuario
+                        user.IsConfirmed = true;
+                        user.Active = true;
+
+                        _context.UserTokens.Remove(userToken);
+
+                        await _context.SaveChangesAsync();
+
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public async Task<string> GenerateTokenNewUserAsync()
+        {
+            return await Task.Run(() => Guid.NewGuid().ToString());
+        }
+
+        public async Task SaveTokenNewUserAsync(User user, string token)
+        {
+            var userToken = new UserToken
+            {
+                UserId = user.UserId,
+                Token = token,
+                StartDate = DateTime.UtcNow
+            };
+            _context.UserTokens.Add(userToken);
+            await _context.SaveChangesAsync();
+        }
+
+        private bool IsTokenValid(string token)
+        {
+            var userToken = _context.UserTokens.FirstOrDefault(t => t.Token == token);
+            return userToken != null;
         }
     }
 }

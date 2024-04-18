@@ -27,11 +27,12 @@ namespace Services.Interfaces
         List<ConsumptionBillDTO> GetBillsByUserId(int userId);
         List<ConsumptionBillDTO> GetAllBills();
         Stream GetBillPdf(int billId);
-        UserDTO PostUser(UserCreationDTO userCreationDTO, string token);
+        UserCreationResponseDTO PostUser(UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);
         Dictionary<int, int> GetUsersCountByDistrict();
         List<UserDTO> GetUsersWithoutBillReport();
         Dictionary<string, int> GetUsersByRoleReport();
+        bool ActivateAccount(string token);
     }
 }
