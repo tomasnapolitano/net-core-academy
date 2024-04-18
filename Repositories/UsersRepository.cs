@@ -911,6 +911,7 @@ namespace Repositories
                     {
                         // Confirmar la cuenta del usuario
                         user.IsConfirmed = true;
+                        user.Active = true;
 
                         _context.UserTokens.Remove(userToken);
 
