@@ -379,7 +379,7 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetUsersByRoleReport();
         }
 
-        // GET: api/Users/activate?token=;
+        // GET: activate?token=;
         /// <summary>
         /// Activa un usuario mediante el Token enviado como parametro
         /// </summary>
