@@ -32,6 +32,9 @@ namespace Repositories
         {
             var searchedUser = await _context.Users.Where(u => 
                                                  u.Email == userLoginDTO.Email)
+                                             .Include(u => u.Address)
+                                             .ThenInclude(a => a.Location)
+                                             .ThenInclude(l => l.District)
                                              .FirstOrDefaultAsync();
 
             if (searchedUser == null)
@@ -532,9 +535,7 @@ namespace Repositories
             _context.BillDetails.AddRange(billDetailEntities);
             await _context.SaveChangesAsync();
 
-            ConsumptionBillDTO billToReturn = _mapper.Map<ConsumptionBillDTO>(consumptionBill);
-            billToReturn.User = _mapper.Map<UserDTO>(user);
-            billToReturn.BillDetails = billDetails;
+            ConsumptionBillDTO billToReturn = await GetBillById(consumptionBill.ConsumptionBillId);
 
             return billToReturn;
         }
