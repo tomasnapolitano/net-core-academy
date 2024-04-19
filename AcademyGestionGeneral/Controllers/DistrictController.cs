@@ -90,6 +90,20 @@ namespace AcademyGestionGeneral.Controllers
             return _districtService.GetDistrictsWithAgent(districtId);
         }
 
+        // GET: api/District/info
+        /// <summary>
+        /// Obtiene una lista de distritos con su/s agente/s y los servicios que brinda
+        /// </summary>
+        /// <returns>List<DistrictInfoDTO></returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpGet("info")]
+        public List<DistrictInfoDTO> GetAllDistrictsInfo()
+        {
+            return _districtService.GetAllDistrictsInfo();
+        }
+
         // PUT: api/District/AddAgentToDistrict/{agentId}/{districtId}
         /// <summary>
         /// Asigna un agente a un distrito en especifico
