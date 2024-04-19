@@ -71,12 +71,70 @@ namespace Repositories
                 throw new KeyNotFoundException("No se encontró el distrito.");
             }
 
-            if (district.AgentId == null)
+            return _mapper.Map<DistrictAgentDTO>(district);
+        }
+        public async Task<DistrictWithServicesDTO> GetDistrictWithServices(int districtId)
+        {
+            var district = await _context.Districts
+                                         .FirstOrDefaultAsync(d => d.DistrictId == districtId);
+            if (district == null)
             {
-                throw new BadRequestException("El distrito no posee agente/s a cargo.");
+                throw new KeyNotFoundException("No se encontró el distrito.");
             }
 
-            return _mapper.Map<DistrictAgentDTO>(district);
+            DistrictWithServicesDTO districtWithServicesDTO = new DistrictWithServicesDTO()
+            {
+                Services = new List<ServiceDTO>()
+            };
+
+            var districtQuery = await _context.Districts
+                                                .Where(d => d.DistrictId == districtId)
+                                                .Select(d => new {
+                                                    District = d,
+                                                    ActiveServices = d.DistrictXservices
+                                                        .Where(dxs => dxs.Active)
+                                                        .Select(dxs => dxs.Service)
+                                                        .ToList()
+                                                })
+                                                .FirstOrDefaultAsync();
+
+            districtWithServicesDTO.DistrictId = districtQuery.District.DistrictId;
+            districtWithServicesDTO.DistrictName = districtQuery.District.DistrictName;
+
+            foreach (var service in districtQuery.ActiveServices)
+            {
+                if (service != null && service.Active)
+                {
+                    var serviceDTO = _mapper.Map<ServiceDTO>(service);
+                    districtWithServicesDTO.Services.Add(serviceDTO);
+                }
+            }
+
+            return districtWithServicesDTO;
+        }
+
+        public async Task<List<DistrictInfoDTO>> GetAllDistrictsInfo()
+        {
+            var allDistricts = await _context.Districts.ToListAsync();
+
+            var districtInfos = new List<DistrictInfoDTO>();
+            foreach (var district in allDistricts)
+            {
+                var districtAgent = await GetDistrictsWithAgent(district.DistrictId);
+                var districtServices = await GetDistrictWithServices(district.DistrictId);
+
+                var districtInfo = new DistrictInfoDTO
+                {
+                    DistrictId = districtAgent.DistrictId,
+                    DistrictName = districtAgent.DistrictName,
+                    Agent = districtAgent.Agent,
+                    Services = districtServices.Services
+                };
+
+                districtInfos.Add(districtInfo);
+            }
+
+            return districtInfos;
         }
 
         public async Task<bool> AddAgentToDistrict(int agentId, int districtId)
@@ -195,46 +253,6 @@ namespace Repositories
             await _context.SaveChangesAsync();
 
             return districtXservice;
-        }
-
-        public async Task<DistrictWithServicesDTO> GetDistrictWithServices(int districtId)
-        {
-            var district = await _context.Districts
-                                         .FirstOrDefaultAsync(d => d.DistrictId == districtId);
-            if (district == null)
-            {
-                throw new KeyNotFoundException("No se encontró el distrito.");
-            }
-
-            DistrictWithServicesDTO districtWithServicesDTO = new DistrictWithServicesDTO()
-            {
-                Services = new List<ServiceDTO>()
-            };
-
-            var districtQuery = await _context.Districts
-                                                .Where(d => d.DistrictId == districtId)
-                                                .Select(d => new {
-                                                    District = d,
-                                                    ActiveServices = d.DistrictXservices
-                                                        .Where(dxs => dxs.Active)
-                                                        .Select(dxs => dxs.Service)
-                                                        .ToList()
-                                                })
-                                                .FirstOrDefaultAsync();
-
-            districtWithServicesDTO.DistrictId = districtQuery.District.DistrictId;
-            districtWithServicesDTO.DistrictName = districtQuery.District.DistrictName;
-
-            foreach (var service in districtQuery.ActiveServices)
-            {
-                if (service!=null && service.Active)
-                {
-                    var serviceDTO = _mapper.Map<ServiceDTO>(service);
-                    districtWithServicesDTO.Services.Add(serviceDTO);
-                }
-            }
-           
-            return districtWithServicesDTO;
         }
 
         public async Task<DistrictWithServicesDTO> DeactivateServiceByDistrict(int districtId, int serviceId)

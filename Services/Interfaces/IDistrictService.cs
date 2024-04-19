@@ -8,6 +8,7 @@ namespace Services.Interfaces
         List<LocationDTO> GetLocations();
         DistrictDTO GetDistrictById(int id);
         DistrictAgentDTO GetDistrictsWithAgent(int districtId);
+        List<DistrictInfoDTO> GetAllDistrictsInfo();
         bool AddAgentToDistrict(int agentId, int districtId);
         bool RemoveAgentFromDistrict(int districtId);
         DistrictWithServicesDTO AddServiceToDistrict(int districtId, int serviceId);
