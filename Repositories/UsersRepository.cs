@@ -32,6 +32,9 @@ namespace Repositories
         {
             var searchedUser = await _context.Users.Where(u => 
                                                  u.Email == userLoginDTO.Email)
+                                             .Include(u => u.Address)
+                                             .ThenInclude(a => a.Location)
+                                             .ThenInclude(l => l.District)
                                              .FirstOrDefaultAsync();
 
             if (searchedUser == null)
