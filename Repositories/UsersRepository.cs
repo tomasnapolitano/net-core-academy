@@ -532,9 +532,7 @@ namespace Repositories
             _context.BillDetails.AddRange(billDetailEntities);
             await _context.SaveChangesAsync();
 
-            ConsumptionBillDTO billToReturn = _mapper.Map<ConsumptionBillDTO>(consumptionBill);
-            billToReturn.User = _mapper.Map<UserDTO>(user);
-            billToReturn.BillDetails = billDetails;
+            ConsumptionBillDTO billToReturn = await GetBillById(consumptionBill.ConsumptionBillId);
 
             return billToReturn;
         }
