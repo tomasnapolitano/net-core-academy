@@ -444,7 +444,7 @@ namespace AcademyGestionGeneral_XUnitTest
 
             //Assert
             Assert.NotNull(result);
-            Assert.IsAssignableFrom<UserDTO>(result);
+            Assert.IsAssignableFrom<UserCreationResponseDTO>(result);
         }
 
         /// <summary>
