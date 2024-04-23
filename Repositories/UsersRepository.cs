@@ -12,6 +12,8 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using Utils.Enum;
 using Utils.Middleware;
+using MailKit.Net.Smtp;
+using MimeKit;
 
 namespace Repositories
 {
@@ -20,12 +22,21 @@ namespace Repositories
         private readonly ManagementServiceContext _context;
         private readonly IMapper _mapper;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly SmtpClient _smtpClient;
+
+        String serverGmail = "smtp.gmail.com";
+        int portGmail = 587;
+        String gmailUser = "itregister@mobydigital.com";
+        String gmailPass = "mobyuser24";
 
         public UsersRepository(ManagementServiceContext context, IMapper mapper, IPasswordHasher passwordHasher)
         {
             _context = context;
             _mapper = mapper;
             _passwordHasher = passwordHasher;
+            _smtpClient = new SmtpClient();
+            _smtpClient.Connect(serverGmail, portGmail, false);
+            _smtpClient.Authenticate(gmailUser, gmailPass);
         }
 
         public async Task<UserWithTokenDTO> Login(UserLoginDTO userLoginDTO)
@@ -686,7 +697,35 @@ namespace Repositories
                 ActivationToken = activationToken
             };
 
+            await SendMail(userCreationDTO.Email, "¡Bienvenido!", activationToken);
             return responseDTO;
+        }
+
+        public async Task SendMail(string mailDest, string subject, string token)
+        {
+            var mensajeBienvenida = @"¡Bienvenido a MobyAcademy - AGAN!
+
+Nos complace darte la bienvenida a nuestra comunidad. Estamos emocionados de tenerte con nosotros y esperamos que disfrutes de todos los recursos y beneficios que ofrecemos.
+
+Para activar tu cuenta, simplemente haz clic en el siguiente enlace:
+[Activar mi cuenta](http://localhost:4200/activate?token=" + token + @")
+
+¡Gracias por unirte a nosotros!
+
+Atentamente,
+El equipo de MobyAcademy - AGAN";
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress("MobyAcademy - AGAN", gmailUser));
+            message.To.Add(new MailboxAddress("", mailDest));
+            message.Subject = subject;
+            message.Body = new TextPart("plain")
+            {
+                Text = mensajeBienvenida
+            };
+
+            await _smtpClient.SendAsync(message);
+            _smtpClient.Disconnect(true);
         }
 
         public async Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token)
