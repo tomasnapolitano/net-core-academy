@@ -25,6 +25,7 @@ namespace Repositories.Interfaces
         Task<UserCreationResponseDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         Task<UserDTO> DeleteUser(int id, string token);
+        Task<UserDTO> ActiveUser(int id, string token, Dictionary<string, object> update);
         Task<ConsumptionBillDTO> GenerateBill(int userId);
         Task<ConsumptionBillDTO> UpdateBillStatus(int billId, int statusId);
         Task<ConsumptionBillDTO> GetBillById(int billId);

@@ -787,6 +787,43 @@ El equipo de MobyAcademy - AGAN";
             return await GetUserById(existingUser.UserId);
         }
 
+        public async Task<UserDTO> ActiveUser(int id, string token, Dictionary<string, object> update)
+        {
+            var rol = GetRolesFromToken(token);
+            var adminRoleValue = Convert.ToInt32(UserRoleEnum.Admin).ToString();
+
+            if (!rol.Contains(adminRoleValue))
+            {
+                throw new UnauthorizedAccessException("El usuario no tiene permisos para acceder a este recurso.");
+            }
+
+            var existingUser = await _context.Users.FindAsync(id);
+
+            if (existingUser == null)
+            {
+                throw new KeyNotFoundException("No se encontró un usuario con el Id ingresado.");
+            }
+
+            if (existingUser.Active == true)
+            {
+                throw new BadRequestException("Este usuario ya se encuentra Activo.");
+            }
+
+            foreach (var kvp in update)
+            {
+                switch (kvp.Key)
+                {
+                    case "active":
+                        existingUser.Active = true;
+                        break;
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            return await GetUserById(existingUser.UserId);
+        }
+
         private async Task<bool> ExistsDniUser(string dni)
         {
             return await _context.Users.AnyAsync(x=> x.Dninumber == dni);
