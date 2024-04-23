@@ -30,6 +30,7 @@ namespace Services.Interfaces
         UserCreationResponseDTO PostUser(UserCreationDTO userCreationDTO, string token);
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);
+        UserDTO ActiveUser(int id, string token, Dictionary<string, object> update);
         Dictionary<int, int> GetUsersCountByDistrict();
         List<UserDTO> GetUsersWithoutBillReport();
         Dictionary<string, int> GetUsersByRoleReport();

@@ -337,6 +337,21 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.DeleteUser(id, token);
         }
 
+        // PUT: api/Users/active/1
+        /// <summary>
+        /// Habilitar un usuario
+        /// </summary>
+        /// <returns>UserDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("active/{id}")]
+        public UserDTO ActiveUser(int id, [FromBody] Dictionary<string, object> update)
+        {
+            string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+            return _usersService.ActiveUser(id, token, update);
+        }
+
         // GET: api/Users/reports/countByDistrict
         /// <summary>
         /// Obtiene la cantidad de usuarios por distritos
