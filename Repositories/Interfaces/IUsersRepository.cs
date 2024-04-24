@@ -27,6 +27,7 @@ namespace Repositories.Interfaces
         Task<UserDTO> DeleteUser(int id, string token);
         Task<UserDTO> ActiveUser(int id, string token, Dictionary<string, object> update);
         Task<ConsumptionBillDTO> GenerateBill(int userId);
+        Task<int> GenerateAllBills();
         Task<ConsumptionBillDTO> UpdateBillStatus(int billId, int statusId);
         Task<ConsumptionBillDTO> GetBillById(int billId);
         Task<List<ConsumptionBillDTO>> GetBillsByUserId(int userId);

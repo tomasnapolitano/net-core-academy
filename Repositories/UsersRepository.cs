@@ -551,6 +551,28 @@ namespace Repositories
             return billToReturn;
         }
 
+        public async Task<int> GenerateAllBills()
+        {
+            int totalBillsGenerated = 0;
+
+            List<User> users = await _context.Users.ToListAsync();
+
+            foreach (var user in users)
+            {
+                try
+                {
+                    await GenerateBill(user.UserId);
+                    totalBillsGenerated++;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error al generar factura para el usuario {user.UserId}: {ex.Message}");
+                }
+            }
+
+            return totalBillsGenerated;
+        }
+
         public async Task<ConsumptionBillDTO> UpdateBillStatus(int billId, int statusId)
         {
             ConsumptionBill bill = await _context.ConsumptionBills.FindAsync(billId);
