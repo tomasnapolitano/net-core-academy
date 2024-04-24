@@ -218,6 +218,20 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GenerateBill(userId);
         } // ------ api/Users/{userId}/bills/generate -----------------------------
 
+        // POST: api/Users/bills/generate
+        /// <summary>
+        /// Genera las facturas de todos los clientes
+        /// </summary>
+        /// <returns>int</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPost("bills/generate")]
+        public int GenerateAllBills()
+        {
+            return _usersService.GenerateAllBills();
+        }
+
         // PATCH: api/Users/bills/{userId}
         /// <summary>
         /// Actualiza el estado de una factura
