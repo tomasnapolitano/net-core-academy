@@ -97,6 +97,11 @@ namespace Services
             return _usersRepository.GetRandomSubscriptionConsumption(subscriptionId).Result;
         }
 
+        public int GetTest()
+        {
+            return _usersRepository.GetTest().Result;
+        }
+
         public ConsumptionBillDTO GenerateBill(int userId)
         {
             return _usersRepository.GenerateBill(userId).Result;

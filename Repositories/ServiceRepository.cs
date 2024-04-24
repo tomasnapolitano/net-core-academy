@@ -66,6 +66,13 @@ namespace Repositories
             return _mapper.Map<ServiceTypeDTO>(serviceType);
         }
 
+        public async Task<int> GetTest()
+        {
+            Random rnd = new Random();
+
+            return rnd.Next(1,15);
+        }
+
         public async Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO)
         {
             var serviceType = await _context.ServiceTypes.Where(x =>

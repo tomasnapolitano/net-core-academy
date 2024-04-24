@@ -22,6 +22,7 @@ namespace Repositories.Interfaces
         Task<UserWithServicesDTO> GetUserWithServicesById(int userId);
         Task<ServiceSubscriptionWithUserDTO> GetSubscription(int subscriptionId);
         Task<ConsumptionDTO> GetRandomSubscriptionConsumption(int subscriptionId);
+        Task<int> GetTest();
         Task<UserCreationResponseDTO> PostUser(UserCreationDTO userCreationDTO, int userRole, string token);
         Task<UserDTO> UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         Task<UserDTO> DeleteUser(int id, string token);

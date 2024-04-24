@@ -10,6 +10,7 @@ namespace Repositories.Interfaces
         Task<ServiceTypeDTO> GetServiceTypeById(int id);
         Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO);
         Task<ServiceDTO> UpdateService(ServiceUpdateDTO serviceDTO);
+        Task<int> GetTest();
         Task<bool> DeleteService(int id);
     }
 }

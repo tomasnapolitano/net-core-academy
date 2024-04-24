@@ -203,6 +203,12 @@ namespace AcademyGestionGeneral.Controllers
             return _usersService.GetRandomSubscriptionConsumption(subscriptionId);
         }
 
+        [HttpGet("test")]
+        public int GetTest()
+        {
+            return _usersService.GetTest();
+        }
+
         // POST: api/Users/bill/{userId}/generate
         /// <summary>
         /// Genera las facturas del cliente elegido

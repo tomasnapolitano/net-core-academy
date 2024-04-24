@@ -558,6 +558,13 @@ namespace Repositories
             return await GetBillById(billId);
         }
 
+        public async Task<int> GetTest()
+        {
+            Random rnd = new Random();
+
+            return rnd.Next(1, 15);
+        }
+
         public async Task<ConsumptionBillDTO> GetBillById(int billId)
         {
             ConsumptionBill consumptionBill = await _context.ConsumptionBills.Include(cb => cb.BillDetails)
