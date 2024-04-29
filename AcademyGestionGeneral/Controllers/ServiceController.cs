@@ -115,5 +115,19 @@ namespace AcademyGestionGeneral.Controllers
         {
             return _serviceService.DeleteService(id);
         }
+
+        // PUT: api/Service/active/1
+        /// <summary>
+        /// Habilitar un servicio
+        /// </summary>
+        /// <returns>ServiceDTO</returns>
+        /// <response code="200">La operación fue exitosa</response>
+        /// <response code="500">Internal server error</response>
+        /// <response code="400">Mal ingreso de datos</response>
+        [HttpPut("active/{id}")]
+        public ServiceDTO ActiveUser(int id, [FromBody] Dictionary<string, object> update)
+        {
+            return _serviceService.ActiveService(id, update);
+        }
     }
 }

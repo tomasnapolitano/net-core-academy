@@ -1,6 +1,7 @@
 using AutoMapper;
-using Microsoft.AspNetCore.Http;
+using MailKit.Net.Smtp;
 using Microsoft.EntityFrameworkCore;
+using MimeKit;
 using Models.DTOs.Bill;
 using Models.DTOs.Login;
 using Models.DTOs.Service;
@@ -12,8 +13,6 @@ using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using Utils.Enum;
 using Utils.Middleware;
-using MailKit.Net.Smtp;
-using MimeKit;
 
 namespace Repositories
 {

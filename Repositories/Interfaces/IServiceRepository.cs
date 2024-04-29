@@ -11,5 +11,6 @@ namespace Repositories.Interfaces
         Task<ServiceDTO> PostService(ServiceCreationDTO serviceCreationDTO);
         Task<ServiceDTO> UpdateService(ServiceUpdateDTO serviceDTO);
         Task<bool> DeleteService(int id);
+        Task<ServiceDTO> ActiveService(int id, Dictionary<string, object> update);
     }
 }

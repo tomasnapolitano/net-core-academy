@@ -50,5 +50,10 @@ namespace Services
         {
             return _serviceRepository.DeleteService(id).Result;
         }
+
+        public ServiceDTO ActiveService(int id, Dictionary<string, object> update)
+        {
+            return _serviceRepository.ActiveService(id, update).Result;
+        }
     }
 }
