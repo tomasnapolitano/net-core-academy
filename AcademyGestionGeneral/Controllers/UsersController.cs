@@ -360,10 +360,10 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpPut("active/{id}")]
-        public UserDTO ActiveUser(int id, [FromBody] Dictionary<string, object> update)
+        public UserDTO ActiveUser(int id)
         {
             string token = Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
-            return _usersService.ActiveUser(id, token, update);
+            return _usersService.ActiveUser(id, token);
         }
 
         // GET: api/Users/reports/countByDistrict

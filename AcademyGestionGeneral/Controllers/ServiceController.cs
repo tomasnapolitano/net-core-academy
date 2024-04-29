@@ -125,9 +125,9 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpPut("active/{id}")]
-        public ServiceDTO ActiveService(int id, [FromBody] Dictionary<string, object> update)
+        public ServiceDTO ActiveService(int id)
         {
-            return _serviceService.ActiveService(id, update);
+            return _serviceService.ActiveService(id);
         }
     }
 }

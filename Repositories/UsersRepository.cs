@@ -808,7 +808,7 @@ El equipo de MobyAcademy - AGAN";
             return await GetUserById(existingUser.UserId);
         }
 
-        public async Task<UserDTO> ActiveUser(int id, string token, Dictionary<string, object> update)
+        public async Task<UserDTO> ActiveUser(int id, string token)
         {
             var rol = GetRolesFromToken(token);
             var adminRoleValue = Convert.ToInt32(UserRoleEnum.Admin).ToString();
@@ -830,15 +830,7 @@ El equipo de MobyAcademy - AGAN";
                 throw new BadRequestException("Este usuario ya se encuentra Activo.");
             }
 
-            foreach (var kvp in update)
-            {
-                switch (kvp.Key)
-                {
-                    case "active":
-                        existingUser.Active = true;
-                        break;
-                }
-            }
+            existingUser.Active = true;
 
             await _context.SaveChangesAsync();
 

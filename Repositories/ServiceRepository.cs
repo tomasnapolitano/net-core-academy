@@ -127,7 +127,7 @@ namespace Repositories
             return true;
         }
 
-        public async Task<ServiceDTO> ActiveService(int id, Dictionary<string, object> update)
+        public async Task<ServiceDTO> ActiveService(int id)
         {
             var existingService = await _context.Services.FindAsync(id);
 
@@ -141,15 +141,7 @@ namespace Repositories
                 throw new BadRequestException("Este servicio ya se encuentra Activo.");
             }
 
-            foreach (var kvp in update)
-            {
-                switch (kvp.Key)
-                {
-                    case "active":
-                        existingService.Active = true;
-                        break;
-                }
-            }
+            existingService.Active = true;
 
             await _context.SaveChangesAsync();
 
