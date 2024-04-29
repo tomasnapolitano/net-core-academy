@@ -126,5 +126,26 @@ namespace Repositories
 
             return true;
         }
+
+        public async Task<ServiceDTO> ActiveService(int id)
+        {
+            var existingService = await _context.Services.FindAsync(id);
+
+            if (existingService == null)
+            {
+                throw new KeyNotFoundException("No se encontró un servicio con el Id ingresado.");
+            }
+
+            if (existingService.Active == true)
+            {
+                throw new BadRequestException("Este servicio ya se encuentra Activo.");
+            }
+
+            existingService.Active = true;
+
+            await _context.SaveChangesAsync();
+
+            return await GetServiceById(existingService.ServiceId);
+        }
     }
 }

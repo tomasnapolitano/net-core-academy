@@ -11,5 +11,6 @@ namespace Services.Interfaces
         ServiceDTO PostService(ServiceCreationDTO serviceCreationDTO);
         ServiceDTO UpdateService(ServiceUpdateDTO serviceUpdateDTO);
         bool DeleteService(int id);
+        ServiceDTO ActiveService(int id);
     }
 }

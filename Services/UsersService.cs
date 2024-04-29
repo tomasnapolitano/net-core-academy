@@ -155,9 +155,9 @@ namespace Services
             return _usersRepository.DeleteUser(id, token).Result;
         }
 
-        public UserDTO ActiveUser(int id, string token, Dictionary<string, object> update)
+        public UserDTO ActiveUser(int id, string token)
         {
-            return _usersRepository.ActiveUser(id, token, update).Result;
+            return _usersRepository.ActiveUser(id, token).Result;
         }
 
         public string GetToken(UserWithTokenDTO userWithTokenDTO)
