@@ -189,7 +189,7 @@ namespace Services
             return tokenHandler.WriteToken(token);
         }
 
-        public Dictionary<int, int> GetUsersCountByDistrict()
+        public Dictionary<string, int> GetUsersCountByDistrict()
         {
             return _usersRepository.GetUsersCountByDistrict().Result;
         }

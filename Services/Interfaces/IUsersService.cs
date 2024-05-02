@@ -32,7 +32,7 @@ namespace Services.Interfaces
         UserDTO UpdateUser(UserUpdateDTO userUpdateDTO, string token);
         UserDTO DeleteUser(int id, string token);
         UserDTO ActiveUser(int id, string token);
-        Dictionary<int, int> GetUsersCountByDistrict();
+        Dictionary<string, int> GetUsersCountByDistrict();
         List<UserDTO> GetUsersWithoutBillReport();
         Dictionary<string, int> GetUsersByRoleReport();
         bool ActivateAccount(string token);

@@ -32,7 +32,7 @@ namespace Repositories.Interfaces
         Task<ConsumptionBillDTO> GetBillById(int billId);
         Task<List<ConsumptionBillDTO>> GetBillsByUserId(int userId);
         Task<List<ConsumptionBillDTO>> GetAllBills();
-        Task<Dictionary<int, int>> GetUsersCountByDistrict();
+        Task<Dictionary<string, int>> GetUsersCountByDistrict();
         Task<List<UserDTO>> GetUsersWithoutBillReport();
         Task<Dictionary<string, int>> GetUsersByRoleReport();
         Task<bool> ActivateAccount(string token);

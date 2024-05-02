@@ -375,7 +375,7 @@ namespace AcademyGestionGeneral.Controllers
         /// <response code="500">Internal server error</response>
         /// <response code="400">Mal ingreso de datos</response>
         [HttpGet("reports/countByDistrict")]
-        public Dictionary<int, int> GetUsersCountByDistrict()
+        public Dictionary<string, int> GetUsersCountByDistrict()
         {
             return _usersService.GetUsersCountByDistrict();
         }

@@ -922,7 +922,7 @@ El equipo de MobyAcademy - AGAN";
             return roles ?? new string[0];
         }
 
-        public async Task<Dictionary<int, int>> GetUsersCountByDistrict()
+        public async Task<Dictionary<string, int>> GetUsersCountByDistrict()
         {
             var usersWithAddresses = await _context.Users
                 .Include(u => u.Address)
@@ -934,22 +934,23 @@ El equipo de MobyAcademy - AGAN";
                 .ToList();
 
             var groupedUsers = usersWithValidLocations
-                .GroupBy(u => u.Address.Location.LocationId)
+                .GroupBy(u => u.Address.Location.LocationName)
                 .ToList();
 
             var usersCountByDistrict = groupedUsers
                 .ToDictionary(
-                    g => g.Key != null ? g.Key : -1, // Si la clave es null, usamos -1 como clave en lugar de null
+                    g => g.Key != null ? g.Key : "Unknown",
                     g => g.Count()
                 );
 
-            if(usersCountByDistrict == null)
+            if (usersCountByDistrict == null)
             {
                 throw new KeyNotFoundException("No se encontraron usuarios en los distritos.");
             }
 
             return usersCountByDistrict;
         }
+
         public async Task<List<UserDTO>> GetUsersWithoutBillReport()
         {
             var usersWithoutConsumption = await _context.Users
